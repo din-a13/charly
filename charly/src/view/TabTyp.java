@@ -70,6 +70,7 @@ public class TabTyp extends Tab {
         betragE.setOnAction(e -> eingabeBestaetigen(e));
         hinweisE.setOnAction(e -> eingabeBestaetigen(e));
         okBtn.setOnAction(e -> eingabeBestaetigen(e));
+        okBtn.setDefaultButton(true);
 
         // // TabellenElemente
         TableColumn<Buchung, String> datumCol = new TableColumn<>("Datum");

@@ -62,7 +62,7 @@ public class Datei {
      * Buchungen IO
      * __________________________________________________________________
      */
-    public static void buchExport(H0Wurzel wurzel, Projekt prj) {
+    public static void buchExport(H0Wurzel wurzel) {
         // Dir muss existieren
         try {
             Files.createDirectories(Paths.get(dir));
@@ -73,7 +73,7 @@ public class Datei {
         // Anfrage an das Modell eine Liste aller Buchungen auszugeben
         // diese kommt ohne Summenbuchungen an
         String s;
-        try (BufferedWriter writer = Files.newBufferedWriter(buchIncrDateiPfad(prj), charset)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(buchIncrDateiPfad(wurzel.getPrj()), charset)) {
             for (Buchung b : wurzel.getBuchungsListe()) {
                 s = b.toString();
                 writer.write(s, 0, s.length());
@@ -103,8 +103,9 @@ public class Datei {
      * __________________________________________________________________
      */
 
+    // sucht im Standart io-Ordner (siehe oben final Atribut)
+    // erzeugt eine Liste aller vorhandenn Projektpfade
     public static List<Path> prjPathList() {
-
         List<Path> prjPathList = new ArrayList<>();
         // Methode aus 400 OI Tutorial Oracle.pdf S.41
         String suche = "*{" + prjSuffix + "}";
@@ -123,6 +124,8 @@ public class Datei {
         return prjPathList;
     }
 
+    // erzeugt ein Projekt aus einem gegebenen Pfad
+    // schreibt den Projektordenerpfad - damit alle Daten der Anwnednung im Richtigen Ordner landen
     public static Projekt readProjekt(Path pfad) {
         String line;
         Projekt prj = null;
@@ -133,6 +136,7 @@ public class Datei {
             // mit GSon deserialisieren
             Gson gson = new Gson();
             prj = gson.fromJson(line, Projekt.class);
+            prj.setPrjFolderPath(pfad.getParent());
         } catch (NoSuchFileException nf) {
             System.err.format("IOException: %s%n" + "Leere Datenbank wird erzeugt", nf);
         } catch (IOException x) {
@@ -142,16 +146,17 @@ public class Datei {
     }
 
     public static void writeProjekt(Projekt prj) {
+
+        // Erzeugt den String mit Gson
+        Gson gson = new Gson();
+        String line = gson.toJson(prj);
+
         // Dir muss existieren
         try {
             Files.createDirectories(Paths.get(dir));
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
         }
-
-        // Erzeugt den String mit Gson
-        Gson gson = new Gson();
-        String line = gson.toJson(prj);
 
         // Schreibt die Datei
         try (BufferedWriter writer = Files.newBufferedWriter(projektIncrDateiPfad(prj), charset)) {
@@ -164,6 +169,9 @@ public class Datei {
 
     /*
      * Standartdatei IO
+     * Projektname - nur zur Info - wird nicht weiter verwendet
+     * Projektpfad - wird zum Laden genutzt
+     * letzterNutzer -> steht im Projekt
      * __________________________________________________________________
      */
 
@@ -213,6 +221,14 @@ public class Datei {
             System.err.format("IOException: %s%n", x);
         }
         return pfad;
+    }
+
+    // Standart ProjektOrdner
+    // Anwendung nur durch Projekt-Konstruktor, wenn ein neues Projekt erzeugt wird
+    static Path stdPrjFolderPath() {
+        Path absPfad = Paths.get(dir).toAbsolutePath();
+        System.out.println(absPfad);
+        return absPfad;
     }
 
 }

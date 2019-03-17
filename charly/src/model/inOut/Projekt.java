@@ -1,34 +1,40 @@
-package model;
+package model.inOut;
 
 import java.io.*;
+import java.nio.file.*;
 
 import javafx.beans.property.*;
 
 public class Projekt implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -2734922782258655130L;
     // PROJEKT-CLASS
-    // - durch Serialisierung, zur Datei
-    // - Dateiname erste 6 Zeichen des Projektname, wenn schon vorhanden, dann n+1
-    // - Dateiendung:prj
-    // - Projektname = String
-    // - eigener Dateiname = String ( muss beim Öffnen überschrieben werden, falls es Änderungen durch den WinExplorer
-    // gab)
-    // - ARRAYS: HELDEN TYPEN JAHRE
-    // - letzter Nutzer
+    // durch Serialisierung, zur Datei
+    // alle Speicherort spezifischen Daten werden mit statischen Methoden der DateiKlasse während der Laufzeit erzeugt
 
     // PROJEKTATTRIBUTE
     private String projektName;
-    private int versionNr = 1;
-    private int buchIdx = 1;
+    private int versionNr = 0;
+    private int buchIdx = 0;
     private String[] HELDEN;
     private String[] TYPEN;
     private int[] JAHRE = { 0, 0 };
+
+    // Attribut nur für die Laufzeit - darf nicht serialisiert werden, sonnst Fehler
+    // diese wird NACH jedem Lesen aus einer Datei neu gesetzt, sonnst standart
+    private transient Path prjFolderPath;
 
     // SITZUNG
     private String initHeld;
     private String initTyp;
 
     public Projekt(String projektName, String[] helden, String[] typen, int[] jahre) throws IllegalArgumentException {
+        // Wenn kein Path, dann wird standartpfad gestzt
+        // dieser wird ggf. noch neu gestzt
+        this.prjFolderPath = Datei.stdPrjFolderPath();
         // NULL test
         if (projektName == null || helden == null || typen == null || jahre == null) {
             throw new IllegalArgumentException("ARGUMENTE DÜRFEN NICHT NULL SEIN");
@@ -66,14 +72,20 @@ public class Projekt implements Serializable {
 
     /*
      * Standart leer
+     * Es muss je ein StandartBild mit Namen Eva.bmp und Daniel.bmp vorhanden sein (sonnst Fehler im Presenter)
      * __________________________________________________________________
      */
-    public static Projekt getProjektStandart() {
+
+    public static Projekt getProjektStandart(String projektName) {
         // DemoArrays
         String[] h = { "Eva", "Daniel" };
         String[] t = { "Lebensmittel", "Kinder", "Wohnung", "Auto", "UrlaubUndSo" };
         int[] j = { 2019, 2020 };
-        return new Projekt("neu", h, t, j);
+        return new Projekt(projektName, h, t, j);
+    }
+
+    public static Projekt getProjektStandart() {
+        return getProjektStandart("neu");
     }
 
     /*
@@ -81,12 +93,23 @@ public class Projekt implements Serializable {
      * __________________________________________________________________
      */
 
-    public void versionNrIncr() {
+    void versionNrIncr() {
         versionNr++;
     }
 
-    public void buchIdxIncr() {
+    void buchIdxIncr() {
         buchIdx++;
+    }
+
+    /*
+     * Setter
+     * __________________________________________________________________
+     */
+
+    // nur durch Datei-Klasse zu nuzten
+    // wenn nicht explizit gesetzt, dann standart gezogen
+    void setPrjFolderPath(Path prjFolderPath) {
+        this.prjFolderPath = prjFolderPath;
     }
 
     /*
@@ -129,6 +152,10 @@ public class Projekt implements Serializable {
 
     public int buchIdx() {
         return buchIdx;
+    }
+
+    public Path getPrjFolderPath() {
+        return prjFolderPath;
     }
 
 }

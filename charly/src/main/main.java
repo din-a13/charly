@@ -80,11 +80,11 @@ public class main extends Application {
         // TODO Standartprojektdateipfad neu setzen
 
         // testmethode
-        Datei.buchExport(w, prj);
+        Datei.buchExport(w);
         // testmethode
-        Datei.writeProjekt(prj);
+        Datei.writeProjekt(w.getPrj());
         // testmethode
-        Datei.stdPrjDateiSchreiben(prj);
+        Datei.stdPrjDateiSchreiben(w.getPrj());
 
     }
 

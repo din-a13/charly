@@ -128,7 +128,7 @@ public class View extends HBox {
     // letzten aktiven Helden setzen
     public void setHeld(String held) {
         // Bild setzen
-        heldenBild.setImage(getImage(held));
+        heldenBild.setImage(presenter.getImage(held));
         // nur das richtige CheckItem anschalten
         for (MenuItem a : heldenMenu.getItems()) {
             CheckMenuItem b = (CheckMenuItem) a;
@@ -145,16 +145,10 @@ public class View extends HBox {
         return tabFeld.getSelectionModel().getSelectedItem();
     }
 
-    private Image getImage(String held) {
-        String url = "view/" + held + ".bmp";
-        Image image = new Image(url, true);
-        return image;
-    }
-
     private void heldenWechsel(ActionEvent e, MenuButton heldenMenu, ImageView heldenBild) {
         String aktHeld = ((MenuItem) e.getSource()).getText();
         // Bild
-        heldenBild.setImage(getImage(aktHeld));
+        heldenBild.setImage(presenter.getImage(aktHeld));
         // andere CheckItem
         CheckMenuItem s = (CheckMenuItem) e.getSource();
         for (MenuItem a : heldenMenu.getItems()) {

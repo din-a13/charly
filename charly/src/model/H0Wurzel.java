@@ -7,6 +7,8 @@ import javafx.beans.binding.*;
 import javafx.beans.property.*;
 import javafx.collections.*;
 
+import model.inOut.*;
+
 // der oberste Knoten des Modells über ihn läuft der gesamte Buchungsprozess
 public class H0Wurzel {
 

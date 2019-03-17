@@ -1,5 +1,7 @@
 package presenter;
 
+import java.net.*;
+import java.nio.file.*;
 import java.time.*;
 
 import javafx.collections.*;
@@ -7,9 +9,11 @@ import javafx.scene.*;
 import javafx.scene.chart.*;
 import javafx.scene.chart.XYChart.*;
 import javafx.scene.control.*;
+import javafx.scene.image.*;
 import javafx.stage.*;
 
 import model.*;
+import model.inOut.*;
 import view.*;
 
 public class Presenter {
@@ -215,12 +219,28 @@ public class Presenter {
         PresenterImport presenterImport = new PresenterImport();
         Projekt prj = presenterImport.getPrjImport(wurzel.getPrj());
         // TODO was passiert dann ???
-
     }
 
     public void Export() {
         // TODO Auto-generated method stub
+    }
 
+    // Auffinden der Bilder
+    public Image getImage(String held) {
+        // Verweis auf Standart im View-ordner
+        String url = "/view/" + held + ".bmp";
+        // Nur wenn im Projektordener wirklich was drinn ist, wird der Standartverweis überschrieben
+        Path prjFolderPath = wurzel.getPrj().getPrjFolderPath();
+        Path imgPath = Paths.get(prjFolderPath.toString() + "\\" + held + ".bmp");
+
+        try {
+            url = imgPath.toUri().toURL().toString();
+        } catch (MalformedURLException e) {
+            System.out.println("Falscher Pfad zu Bildern-Standart wird genutzt");
+        }
+        System.out.println(url);
+        Image image = new Image(url, true);
+        return image;
     }
 
     /*
