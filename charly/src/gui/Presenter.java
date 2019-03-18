@@ -27,6 +27,7 @@ public class Presenter {
      *
      */
 
+    private Stage primaryStage;
     private View view;
     private H0Wurzel wurzel;
     // Projektinstanz über die Wurzel ziehen -> singel source of throuth
@@ -45,21 +46,28 @@ public class Presenter {
      */
 
     // initialisieren
-    public void initView() {
+    private void initView() {
         view.setHelden(wurzel.getPrj().HELDEN());
         view.setTypen(wurzel.getPrj().TYPEN());
         view.setTyp(wurzel.getPrj().initTyp());
         view.setHeld(aktHeld);
+        setTitle();
     }
 
     public void showView(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         // Scene und Bühne zusammen stecken & starten
         Scene scene = new Scene(view);
+        setTitle();
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Charly - " + wurzel.getPrj().name());
         primaryStage.show();
     }
 
+    private void setTitle() {
+        if (primaryStage != null) {
+            primaryStage.setTitle("Charly        ||Projekt:  " + wurzel.getPrj().name() + " |Version: " + wurzel.getPrj().versionNr() + " |Index: " + wurzel.getPrj().buchIdx());
+        }
+    }
     /*
      * GETTER -- Ansprache durch TabTYP
      * __________________________________________________________________
@@ -223,6 +231,9 @@ public class Presenter {
      */
     // ImportButton / "Laden"
     public void Import() {
+        // TODO prüfen ob gut - Sicherheitshalber wird das aktuelle Projekt exportiert
+        Datei.buchExport(wurzel);
+
         PresenterImport presenterImport = new PresenterImport();
         // aktuelles Projekt wird übergeben, damit es auch in der Liste angezeigt wird
         // Rückgabe ist das neu gewählte Projekt

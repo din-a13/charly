@@ -1,4 +1,4 @@
 /bin/
-gitignore
-project
-.txt
+*.gitignore
+*.project
+*.txt

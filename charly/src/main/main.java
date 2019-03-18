@@ -53,8 +53,8 @@ public class main extends Application {
          * __________________________________________________________________
          */
 
-        Presenter p = new Presenter(wurzel);
-        p.showView(primaryStage);
+        Presenter presenter = new Presenter(wurzel);
+        presenter.showView(primaryStage);
 
     }
 
@@ -76,11 +76,12 @@ public class main extends Application {
         // TODO Standartprojektdateipfad neu setzen
 
         // Buchungen automatisch schreiben - kein Datenverlust
+        // dabei wird auch das Projekt geschrieben, damit BuchIdx richtig abgelegt ist
         Datei.buchExport(wurzel);
+
         // Projekt schreiben - hier ist letzter User und letzter typ gesetzt
         // TODO BEI TEAMPROJEKTEN MACHT DAS KEINEN SINN
         // DAS MUSS BEIM STANDART GESPEICHERT SEIN
-        Datei.writeProjekt(wurzel.getPrj(), false);
 
     }
 

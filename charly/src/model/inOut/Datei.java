@@ -54,6 +54,10 @@ public class Datei {
 
     /*
      * Buchungen IO
+     *
+     * Wenn Buchung exportiert wird, muss auch Projekt exportiert werden, damit die Angabe zum BuchIdx konsistent ist
+     *
+     * Wenn Buchung importiert wird, ist vorher bereits ein Projekt oder eine ganze Projektliste importiert worden
      * __________________________________________________________________
      */
     public static void buchExport(H0Wurzel wurzel) {
@@ -81,6 +85,9 @@ public class Datei {
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
+        // Projekt auch abspeichern
+        writeProjekt(wurzel.getPrj(), false);
+
     }
 
     public static void buchImport(H0Wurzel wurzel) throws IllegalBuchungException {
@@ -123,7 +130,7 @@ public class Datei {
         return prjPathList;
     }
 
-    // erzeugt ein Projekt aus einem gegebenen Pfad
+    // erzeugt / liest ein Projekt aus einem gegebenen Pfad
     // schreibt den Projektordenerpfad - damit alle Daten der Anwnednung im richtigen Ordner landen
     public static Projekt readProjekt(Path pfad) {
         String line;

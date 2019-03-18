@@ -65,14 +65,16 @@ public class PresenterImport {
         // -> aktuelles Wurzelprojekt hinzufügen
         if (pathList.isEmpty()) {
             // Auswahldialog starten mit aktuellem Projekt
-            // prjList.add(prj);
-            // TODO geändert - das erwartet der Nutzer eigendlich nicht
+            // TODO prüfen - das erwartet der Nutzer eigendlich nicht
+            prjList.add(prj);
+
             importDialog(prjList);
         } else {
-            // TODO muss hier auch das aktuelle Projekt angezeigt werden ?
+            // muss hier auch das aktuelle Projekt angezeigt werden ?
             // nein - das erwartet der User nicht beim Knopf neu laden
-            // Projekte erzeugen
-            // Auswahldialog starten
+            // TODO - prüfen, dadurch dass jetzt standartmäßig gespeicher wird, iwrd auch das aktuelle Projekt angezeigt
+
+            // Projekte erzeugen & Auswahldialog starten
             importDialog(prjSammeln(pathList, prjList));
         }
         // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
@@ -114,12 +116,12 @@ public class PresenterImport {
     public void returnEnd(Projekt prj, boolean selected) {
         // Bevor das DialogFenster aus showAndWait zurück kehrt, wird hier im Presenter das Projekt gesetzt
         // Test, ob sich was überhaupt was geädert hat
-        if (this.prj != prj) {
+        if (this.prj != prj && prj != null) {
             this.prj = prj;
             this.prjHasChanged = true;
         }
         // Standart setzen
-        if (selected) { Datei.stdPrjDateiSchreiben(prj); }
+        if (selected && prj != null) { Datei.stdPrjDateiSchreiben(prj); }
         // jetzt DialogStage schließen
         viewImportDialog.close();
         // Jetzt springt der Focus zurück zum Punkt showAndWait

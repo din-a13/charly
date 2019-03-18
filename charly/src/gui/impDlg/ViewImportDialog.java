@@ -43,7 +43,7 @@ public class ViewImportDialog extends Stage {
         // dialogEingabe.setGridLinesVisible(true);
 
         // // Hinweistext
-        Label aufforderung = new Label("Wähle ein vorhandes Projekt aus, oder gib einen Projektnamen ein um ein neuen Projekt zu erzeugen. " + "ACHTUNG nicht gespeicherte Buchungen gehen verloren! ACHTUNG");
+        Label aufforderung = new Label(" Wähle ein vorhandes Projekt aus, oder gib einen Projektnamen ein um ein neues Projekt zu erzeugen. ");
         aufforderung.setWrapText(true);
         aufforderung.setTextAlignment(TextAlignment.CENTER);
         aufforderung.setPadding(new Insets(View.SPACE * 3, View.SPACE, View.SPACE * 3, View.SPACE));
@@ -72,23 +72,9 @@ public class ViewImportDialog extends Stage {
         auswahl.setEditable(true);
         auswahl.setPrefWidth(Double.MAX_VALUE);
         GridPane.setHgrow(auswahl, Priority.ALWAYS);
-        auswahl.setConverter(new StringConverter<Projekt>() {
-            @Override
-            public String toString(Projekt prj) {
-                if (prj != null) {
-                    return prj.name();
-                } else {
-                    return " ";
-                }
-            }
+        PrjStringConverter converter = new PrjStringConverter(auswahl);
+        auswahl.setConverter(converter);
 
-            @Override
-            public Projekt fromString(String eingabe) {
-                if (eingabe == null || eingabe.trim().equals("")) { eingabe = "neu"; }
-                Projekt neu = Projekt.getProjektStandart(eingabe);
-                return neu;
-            }
-        });
         // // Platzieren
         dialogEingabe.add(auswahl, 0, 1, 3, 1);
 
@@ -146,7 +132,7 @@ public class ViewImportDialog extends Stage {
         // Zusammen stecken
         Scene dialogScene = new Scene(dialogEingabe);
         this.setScene(dialogScene);
-        this.setMinHeight(View.EINGABEBREITE * 9);
+        this.setMinHeight(View.EINGABEBREITE * 11);
         this.setMinWidth(View.EINGABEBREITE * 16);
         // this.setResizable(false);
         this.setTitle("IMPORT");
@@ -158,6 +144,7 @@ public class ViewImportDialog extends Stage {
 
     /*
      * Dialog einrichten
+     * Die Combobox braucht die Liste, aber der Converter auch - der holt Sie sich über die ComboBox
      * __________________________________________________________________
      */
 

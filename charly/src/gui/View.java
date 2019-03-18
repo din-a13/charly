@@ -79,7 +79,7 @@ public class View extends HBox {
         dateiMenu.setPopupSide(Side.RIGHT);
         MenuItem imp = new MenuItem("neu laden");
         imp.setOnAction((e) -> presenter.Import());
-        MenuItem exp = new MenuItem("neu laden");
+        MenuItem exp = new MenuItem("speichern");
         exp.setOnAction((e) -> presenter.Export());
         dateiMenu.getItems().addAll(imp, exp);
 
