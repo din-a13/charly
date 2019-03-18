@@ -1,0 +1,1 @@
+{"projektName":"neu","versionNr":0,"buchIdx":0,"HELDEN":["Eva","Daniel"],"TYPEN":["Lebensmittel","Kinder","Wohnung","Auto","UrlaubUndSo"],"JAHRE":[2019,2020],"initTyp":"Lebensmittel"}
