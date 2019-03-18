@@ -6,9 +6,10 @@ import javafx.application.*;
 import javafx.beans.binding.*;
 import javafx.stage.*;
 
+import gui.*;
+import gui.impDlg.*;
 import model.*;
 import model.inOut.*;
-import presenter.*;
 
 public class main extends Application {
 
@@ -16,7 +17,7 @@ public class main extends Application {
         launch(args);
     }
 
-    H0Wurzel w;
+    H0Wurzel wurzel;
     Projekt prj;
 
     @Override
@@ -33,31 +34,26 @@ public class main extends Application {
         /*
          * Wurzel initieren,
          * Einlesen der verschiedenen Grunddaten (durchWurzel)
+         * aus dem Projekt kann später vom Presenter auch der InitHeld erfragt werden
          * __________________________________________________________________
          */
-        w = H0Wurzel.getInstance();
-        w.initWurzel(prj);
-        w.initModel();
+        wurzel = H0Wurzel.getInstance();
+        wurzel.initWurzel(prj);
+        wurzel.initModel();
 
         /*
-         * TODO Einlesen der Sitzungsdaten aus einer Datei
+         * Einlesen der Buchungen aus einer Datei, entsprechend Projektpfad
          * __________________________________________________________________
          */
 
-        /*
-         * TODO Einlesen der Buchungen aus einer Datei
-         * __________________________________________________________________
-         */
-
-        Datei.buchImport(w, prj);
+        Datei.buchImport(wurzel);
 
         /*
          * Presenter initieren
          * __________________________________________________________________
          */
 
-        // TODO
-        Presenter p = new Presenter(w);
+        Presenter p = new Presenter(wurzel);
         p.showView(primaryStage);
 
     }
@@ -79,12 +75,12 @@ public class main extends Application {
         // durch Presenter
         // TODO Standartprojektdateipfad neu setzen
 
-        // testmethode
-        Datei.buchExport(w);
-        // testmethode
-        Datei.writeProjekt(w.getPrj());
-        // testmethode
-        Datei.stdPrjDateiSchreiben(w.getPrj());
+        // Buchungen automatisch schreiben - kein Datenverlust
+        Datei.buchExport(wurzel);
+        // Projekt schreiben - hier ist letzter User und letzter typ gesetzt
+        // TODO BEI TEAMPROJEKTEN MACHT DAS KEINEN SINN
+        // DAS MUSS BEIM STANDART GESPEICHERT SEIN
+        Datei.writeProjekt(wurzel.getPrj(), false);
 
     }
 

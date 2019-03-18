@@ -1,4 +1,4 @@
-package view;
+package gui;
 
 import javafx.event.*;
 import javafx.geometry.*;

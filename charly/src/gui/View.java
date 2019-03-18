@@ -1,4 +1,4 @@
-package view;
+package gui;
 
 import java.util.*;
 
@@ -9,17 +9,15 @@ import javafx.scene.control.TabPane.*;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
 
-import presenter.*;
-
 public class View extends HBox {
 
     /*
      * StyleAtribute - für alle Views Sichtbar
      * __________________________________________________________________
      */
-    final static double SPACE = 3.0;
-    final static Insets SPACEAROUND = new Insets(SPACE, SPACE, SPACE, SPACE);
-    final static double EINGABEBREITE = 20.0;
+    public final static double SPACE = 3.0;
+    public final static Insets SPACEAROUND = new Insets(SPACE, SPACE, SPACE, SPACE);
+    public final static double EINGABEBREITE = 20.0;
 
     /*
      * View Aufbauen
@@ -39,7 +37,7 @@ public class View extends HBox {
     ImageView heldenBild;
     MenuButton heldenMenu;
 
-    public View(Presenter presenter, String[] HELDEN, String[] TYPEN) {
+    public View(Presenter presenter) {
         this.presenter = presenter;
 
         /* TEILUNG hor 2 */
@@ -74,17 +72,11 @@ public class View extends HBox {
         // // // Helden Menu
         heldenMenu.setPrefWidth(EINGABEBREITE * 4);
         heldenMenu.setPopupSide(Side.RIGHT);
-        for (int i = 0; i < HELDEN.length; i++) {
-            MenuItem neu = new CheckMenuItem(HELDEN[i]);
-            // Listener anmelden
-            neu.setOnAction((e) -> heldenWechsel(e, heldenMenu, heldenBild));
-            heldenMenu.getItems().add(neu);
-        }
 
         // // Import Export
-        Button importieren = new Button("Import");
-        Button exportieren = new Button("Export");
-        io.getChildren().addAll(importieren, exportieren);
+        Button importieren = new Button("neu Laden");
+        Button exportieren = new Button("Speichern");
+        io.getChildren().addAll(exportieren, importieren);
         io.setSpacing(SPACE);
         importieren.setPrefWidth(EINGABEBREITE * 4);
         exportieren.setPrefWidth(EINGABEBREITE * 4);
@@ -95,23 +87,6 @@ public class View extends HBox {
         // TabFeld einrichten
         tabFeld.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         tabFeld.setTabMinWidth(EINGABEBREITE * 4);
-        // Tabs einrichten
-        for (int j = 0; j < TYPEN.length; j++) {
-            TabTyp tab = new TabTyp(presenter, TYPEN[j]);
-            // tab.setOnSelectionChanged(e -> presenter.tabellenAnsichtNeu());
-            // brauch ich diese TabListe ??
-            // JA, da später auch weitere Tabs kommen könnten
-            // z.B. für Einstellungen
-            tabListe.put(TYPEN[j], tab);
-            tabFeld.getTabs().add(tab);
-        }
-
-        // Tab für Auswertung einfügen
-        // wird nicht in die tabListe eingefügt, die ist nur für die Typen da
-        TabWertung tabA = new TabWertung(presenter, "Auswertung");
-        tabFeld.getTabs().add(tabA);
-
-        // TODO weiteren Tab für Einstellungen
 
     }
 
@@ -119,14 +94,43 @@ public class View extends HBox {
      * Initialisierung durch Presenter
      * __________________________________________________________________
      */
+    // Helden löschen und setzen
+    void setHelden(String[] HELDEN) {
+        heldenMenu.getItems().clear();
+        for (int i = 0; i < HELDEN.length; i++) {
+            MenuItem neu = new CheckMenuItem(HELDEN[i]);
+            // Listener anmelden
+            neu.setOnAction((e) -> heldenWechsel(e, heldenMenu, heldenBild));
+            heldenMenu.getItems().add(neu);
+        }
+    }
+
+    // Tab -> Typen löschen und setzen
+    void setTypen(String[] TYPEN) {
+        // Typen
+        tabFeld.getTabs().clear();
+        tabListe.clear();
+        for (int j = 0; j < TYPEN.length; j++) {
+            TabTyp tab = new TabTyp(presenter, TYPEN[j]);
+            // brauch ich diese TabListe ??
+            // JA, da später auch weitere Tabs kommen könnten
+            // z.B. für Einstellungen
+            tabListe.put(TYPEN[j], tab);
+            tabFeld.getTabs().add(tab);
+        }
+        // Tab für Auswertung einfügen
+        // wird nicht in die tabListe eingefügt, die ist nur für die Typen da
+        TabWertung tabA = new TabWertung(presenter, "Auswertung");
+        tabFeld.getTabs().add(tabA);
+    }
 
     // letztes aktives Tab wieder setzen
-    public void setTyp(String initTyp) {
+    void setTyp(String initTyp) {
         tabFeld.getSelectionModel().select(tabListe.get(initTyp));
     }
 
     // letzten aktiven Helden setzen
-    public void setHeld(String held) {
+    void setHeld(String held) {
         // Bild setzen
         heldenBild.setImage(presenter.getImage(held));
         // nur das richtige CheckItem anschalten

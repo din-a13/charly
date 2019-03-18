@@ -18,18 +18,21 @@ public class Projekt implements Serializable {
     // PROJEKTATTRIBUTE
     private String projektName;
     private int versionNr = 0;
-    private int buchIdx = 0;
+    private int buchIdx = -1; // vor dem ersten Schreiben wird um 1 erhöht
     private String[] HELDEN;
     private String[] TYPEN;
     private int[] JAHRE = { 0, 0 };
 
-    // Attribut nur für die Laufzeit - darf nicht serialisiert werden, sonnst Fehler
-    // diese wird NACH jedem Lesen aus einer Datei neu gesetzt, sonnst standart
-    private transient Path prjFolderPath;
-
     // SITZUNG
+    // TODO BEI TEAMPROJEKTEN MACHT DAS KEINEN SINN
+    // DAS MUSS BEIM STANDART GESPEICHERT SEIN
     private String initHeld;
     private String initTyp;
+
+    // LAUFZEIT
+    // Attribut nur für die Laufzeit - darf nicht serialisiert werden, sonnst Fehler
+    // diese wird NACH jedem Lesen aus einer Datei neu gesetzt, sonnst standart gemäß Datei.class
+    private transient Path prjFolderPath;
 
     public Projekt(String projektName, String[] helden, String[] typen, int[] jahre) throws IllegalArgumentException {
         // Wenn kein Path, dann wird standartpfad gestzt
@@ -95,6 +98,7 @@ public class Projekt implements Serializable {
 
     void versionNrIncr() {
         versionNr++;
+        projektName += ("." + Datei.int3Strg(versionNr));
     }
 
     void buchIdxIncr() {
@@ -102,11 +106,11 @@ public class Projekt implements Serializable {
     }
 
     /*
-     * Setter
+     * Setter - nur durch Datei-Klasse zu nuzten
      * __________________________________________________________________
      */
 
-    // nur durch Datei-Klasse zu nuzten
+    // wird nicht serealisiert
     // wenn nicht explizit gesetzt, dann standart gezogen
     void setPrjFolderPath(Path prjFolderPath) {
         this.prjFolderPath = prjFolderPath;

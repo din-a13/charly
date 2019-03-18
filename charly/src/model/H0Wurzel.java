@@ -42,47 +42,6 @@ public class H0Wurzel {
         this.prj = project;
     }
 
-    // DEPRECATED
-    /*
-     * String[] HELDEN;
-     * String[] TYPEN;
-     * int[] JAHRE = { 0, 0, 0 };
-     *
-     * public void initWurzel(String[] helden, String[] typen, int[] jahre) throws IllegalArgumentException {
-     * // helden
-     * for (int i = 0; i < helden.length - 1; i++) {
-     * for (int j = i + 1; j < helden.length; j++) {
-     * if (helden[i].equals(helden[j])) {
-     * throw new IllegalArgumentException("ES KANN NUR EINEN GEBEN! - Helden bitte nicht doppeln");
-     * }
-     * }
-     * }
-     * this.HELDEN = helden;
-     *
-     * // typen
-     * for (int i = 0; i < typen.length - 1; i++) {
-     * for (int j = i + 1; j < typen.length; j++) {
-     * if (typen[i].equals(typen[j])) {
-     * throw new IllegalArgumentException("ES KANN NUR EINEN GEBEN! - Typen bitte nicht doppeln");
-     * }
-     * }
-     * }
-     * this.TYPEN = typen;
-     *
-     * // TODO DIE UMRECHNEREI IST UNNÖTIG; DA ICH KEIN ARRAY MEHR HABE
-     * // TODO ACHTUNG AUCH IM PRESENTER ANPASSEN
-     * // Jahre - wenn das Feld 3 lang ist, kommt es aus einer Importfunktion und muss nicht geprüft werden
-     * if (jahre.length == 2) {
-     * if (jahre[0] < 2000 || 2099 < jahre[1] || jahre[0] > jahre[1]) {
-     * throw new IllegalArgumentException("WANN LEBST DU DENN? - bitte 2000<=min, max<=2099");
-     * }
-     * }
-     * this.JAHRE[0] = jahre[0] - 2000;
-     * this.JAHRE[1] = jahre[1] - 2000;
-     * this.JAHRE[2] = 99;
-     * }
-     */
-
     /*
      * Modell aufbauen
      * __________________________________________________________________
@@ -288,21 +247,6 @@ public class H0Wurzel {
     public Projekt getPrj() {
         return prj;
     }
-
-    /*
-     * DEPRECATED
-     * public String[] getHELDEN() {
-     * return HELDEN;
-     * }
-     *
-     * public String[] getTYPEN() {
-     * return TYPEN;
-     * }
-     *
-     * public int[] getJAHRE() {
-     * return JAHRE;
-     * }
-     */
 
     /*
      * Zugriff durch Presenter

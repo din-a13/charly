@@ -1,4 +1,4 @@
-package view;
+package gui;
 
 import java.time.*;
 import java.time.format.*;

@@ -1,4 +1,4 @@
-package view;
+package gui.impDlg;
 
 import javafx.collections.*;
 import javafx.geometry.*;
@@ -9,11 +9,10 @@ import javafx.scene.text.*;
 import javafx.stage.*;
 import javafx.util.*;
 
-import model.*;
+import gui.*;
 import model.inOut.*;
-import presenter.*;
 
-public class ImportDialog extends Stage {
+public class ViewImportDialog extends Stage {
 
     /*
      * Dialog einrichten & initial aufbauen
@@ -33,7 +32,7 @@ public class ImportDialog extends Stage {
      *
      */
 
-    public ImportDialog() {
+    public ViewImportDialog() {
 
         //
         dialogEingabe = new GridPane();
@@ -44,7 +43,7 @@ public class ImportDialog extends Stage {
         // dialogEingabe.setGridLinesVisible(true);
 
         // // Hinweistext
-        Label aufforderung = new Label("Wähle ein vorhandes Projekt aus, oder gib einen Projektnamen ein um ein neuen Projekt zu erzeugen");
+        Label aufforderung = new Label("Wähle ein vorhandes Projekt aus, oder gib einen Projektnamen ein um ein neuen Projekt zu erzeugen. " + "ACHTUNG nicht gespeicherte Buchungen gehen verloren! ACHTUNG");
         aufforderung.setWrapText(true);
         aufforderung.setTextAlignment(TextAlignment.CENTER);
         aufforderung.setPadding(new Insets(View.SPACE * 3, View.SPACE, View.SPACE * 3, View.SPACE));
@@ -147,8 +146,8 @@ public class ImportDialog extends Stage {
         // Zusammen stecken
         Scene dialogScene = new Scene(dialogEingabe);
         this.setScene(dialogScene);
-        this.setMinHeight(View.EINGABEBREITE * 8);
-        this.setMinWidth(View.EINGABEBREITE * 15);
+        this.setMinHeight(View.EINGABEBREITE * 9);
+        this.setMinWidth(View.EINGABEBREITE * 16);
         // this.setResizable(false);
         this.setTitle("IMPORT");
         this.initModality(Modality.APPLICATION_MODAL);

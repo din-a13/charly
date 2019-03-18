@@ -1,4 +1,4 @@
-package view;
+package gui;
 
 import java.time.*;
 
@@ -11,7 +11,7 @@ import javafx.scene.chart.XYChart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import presenter.*;
+import gui.impDlg.*;
 
 public class TabWertung extends Tab {
 

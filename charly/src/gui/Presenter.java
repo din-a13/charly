@@ -1,4 +1,4 @@
-package presenter;
+package gui;
 
 import java.net.*;
 import java.nio.file.*;
@@ -12,9 +12,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.stage.*;
 
+import gui.impDlg.*;
 import model.*;
 import model.inOut.*;
-import view.*;
 
 public class Presenter {
 
@@ -35,17 +35,24 @@ public class Presenter {
     public Presenter(H0Wurzel w) {
         this.wurzel = w;
         this.aktHeld = w.getPrj().initHeld();
-        this.view = new View(this, w.getPrj().HELDEN(), w.getPrj().TYPEN());
+        this.view = new View(this);
+        initView();
     }
 
     /*
-     * View starten
+     * View initialisieren & starten
      * __________________________________________________________________
      */
-    public void showView(Stage primaryStage) {
-        // View initialisieren
+
+    // initialisieren
+    public void initView() {
+        view.setHelden(wurzel.getPrj().HELDEN());
+        view.setTypen(wurzel.getPrj().TYPEN());
         view.setTyp(wurzel.getPrj().initTyp());
         view.setHeld(aktHeld);
+    }
+
+    public void showView(Stage primaryStage) {
         // Scene und Bühne zusammen stecken & starten
         Scene scene = new Scene(view);
         primaryStage.setScene(scene);
@@ -203,32 +210,51 @@ public class Presenter {
 
     public void heldenWechsel(String aktHeld, Tab aktTab) {
         this.aktHeld = aktHeld;
-        if (aktTab.getClass().toString().equals("class view.TabTyp")) {
+        if (aktTab.getClass().toString().equals("class gui.TabTyp")) {
             String aktTyp = aktTab.getText();
             tabellenAnsichtNeu((TabTyp) aktTab);
-            // TODO FALSCH LÖSCHEN ((TabTyp) aktTab).aktAnsicht(wurzel.getTypBuchungsListe(aktHeld, aktTyp));
         }
     }
+
     /*
-     * I / O
+     * I / O Aufrufe durch View
      * __________________________________________________________________
      *
      */
-
+    // ImportButton / "Laden"
     public void Import() {
         PresenterImport presenterImport = new PresenterImport();
+        // aktuelles Projekt wird übergeben, damit es auch in der Liste angezeigt wird
+        // Rückgabe ist das neu gewählte Projekt
         Projekt prj = presenterImport.getPrjImport(wurzel.getPrj());
-        // TODO was passiert dann ???
+
+        // nur, wenn es eine Änderung gab!
+        if (presenterImport.prjHasChanged()) {
+            // WURZEL neu aufbauen
+            // MainMethoden nachahmen
+            wurzel.initWurzel(prj);
+            wurzel.initModel();
+            try {
+                Datei.buchImport(wurzel);
+            } catch (IllegalBuchungException e) {
+                System.out.println("Eine oder mehrere Buchungen passen nicht zum Projekt.");
+                System.err.print(e.getMessage());
+            }
+            // View komplett neu initialisieren
+            // Das passiert mit dem neuen Projekt in der neuen Wurzel
+            initView();
+        }
     }
 
+    // Export Button / "Speichern"
     public void Export() {
         // TODO Auto-generated method stub
     }
 
-    // Auffinden der Bilder
-    public Image getImage(String held) {
+    // Auffinden der HeldenIcon
+    Image getImage(String held) {
         // Verweis auf Standart im View-ordner
-        String url = "/view/" + held + ".bmp";
+        String url = "/gui/" + held + ".bmp";
         // Nur wenn im Projektordener wirklich was drinn ist, wird der Standartverweis überschrieben
         Path prjFolderPath = wurzel.getPrj().getPrjFolderPath();
         Path imgPath = Paths.get(prjFolderPath.toString() + "\\" + held + ".bmp");
@@ -236,9 +262,9 @@ public class Presenter {
         try {
             url = imgPath.toUri().toURL().toString();
         } catch (MalformedURLException e) {
-            System.out.println("Falscher Pfad zu Bildern-Standart wird genutzt");
+            System.out.println("im Projektordner sind keine Icon vorhanden: 'heldName.bmp'");
         }
-        System.out.println(url);
+        System.out.println("HeldIcon gefunden" + url);
         Image image = new Image(url, true);
         return image;
     }

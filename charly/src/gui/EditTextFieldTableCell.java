@@ -1,4 +1,4 @@
-package view;
+package gui;
 
 import javafx.scene.control.*;
 import javafx.scene.control.cell.*;

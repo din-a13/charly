@@ -16,45 +16,39 @@ public class Datei {
      * __________________________________________________________________
      */
     private static Charset charset = Charset.forName("UTF-8");
-    private static final String dir = "io/";
+    private static final String dir = "io/"; // Mutterverzeichniss ist der Projektordner im Workspace
     private static final String prjSuffix = ".prj.txt";
     private static final String bchSuffix = ".bch.txt";
 
     /*
-     * Dateipfade & Versionskontrolle
+     * Dateipfade
      * __________________________________________________________________
      */
 
     // alle PRIVATE
-    // Mutterverzeichniss ist der Projektordner im Workspace
-    // Dateipfad zusammen aus standart Direktory, Projektname, Version/ Index und Suffix
+    // Dateipfade zusammengesetzt aus ProjektFolder, Projektname, Version/ Index und Suffix
 
     private static Path prjDateiPfad(Projekt prj) {
-        String relPfad = dir + prj.name() + "." + int3Strg(prj.versionNr()) + prjSuffix;
-        Path absPfad = Paths.get(relPfad).toAbsolutePath();
-        System.out.println(absPfad);
-        return absPfad;
-    }
+        // String relPfad = dir + prj.name() + "." + int3Strg(prj.versionNr()) + prjSuffix;
+        // Path absPfad = Paths.get(relPfad).toAbsolutePath();
 
-    private static Path projektIncrDateiPfad(Projekt prj) {
-        prj.versionNrIncr();
-        return prjDateiPfad(prj);
+        // Jetzt hat das Projekt einen Pfad hinterlegt
+        Path absPfad = prj.getPrjFolderPath().resolve(prj.name() + "." + int3Strg(prj.versionNr()) + prjSuffix);
+        return absPfad;
     }
 
     private static Path buchDateiPfad(Projekt prj) {
-        String relPfad = dir + prj.name() + "." + int3Strg(prj.versionNr()) + "." + int3Strg(prj.buchIdx()) + bchSuffix;
-        Path absPfad = Paths.get(relPfad).toAbsolutePath();
-        System.out.println(absPfad);
+        // String relPfad = dir + prj.name() + "." + int3Strg(prj.versionNr()) + "." + int3Strg(prj.buchIdx()) +
+        // bchSuffix;
+        // Path absPfad = Paths.get(relPfad).toAbsolutePath();
+
+        // Jetzt hat das Projekt einen Pfad hinterlegt
+        Path absPfad = prj.getPrjFolderPath().resolve(prj.name() + "." + int3Strg(prj.versionNr()) + "." + int3Strg(prj.buchIdx()) + bchSuffix);
         return absPfad;
     }
 
-    private static Path buchIncrDateiPfad(Projekt prj) {
-        prj.buchIdxIncr();
-        return buchDateiPfad(prj);
-    }
-
-    // Hilfsmethode
-    private static String int3Strg(int v) {
+    // Hilfsmethode nutzt auch die Projektklasse
+    static String int3Strg(int v) {
         return String.format("%03d", v);
     }
 
@@ -63,9 +57,14 @@ public class Datei {
      * __________________________________________________________________
      */
     public static void buchExport(H0Wurzel wurzel) {
+        // vor jedem Speichern wird die Version der Buchungsdatei erhöht
+        wurzel.getPrj().buchIdxIncr();
+
         // Dir muss existieren
         try {
-            Files.createDirectories(Paths.get(dir));
+            // Files.createDirectories(Paths.get(dir));
+            // Jetzt hat das Projekt einen Pfad hinterlegt
+            Files.createDirectories(wurzel.getPrj().getPrjFolderPath());
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
         }
@@ -73,7 +72,7 @@ public class Datei {
         // Anfrage an das Modell eine Liste aller Buchungen auszugeben
         // diese kommt ohne Summenbuchungen an
         String s;
-        try (BufferedWriter writer = Files.newBufferedWriter(buchIncrDateiPfad(wurzel.getPrj()), charset)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(buchDateiPfad(wurzel.getPrj()), charset)) {
             for (Buchung b : wurzel.getBuchungsListe()) {
                 s = b.toString();
                 writer.write(s, 0, s.length());
@@ -84,8 +83,8 @@ public class Datei {
         }
     }
 
-    public static void buchImport(H0Wurzel wurzel, Projekt prj) throws IllegalBuchungException {
-        try (BufferedReader reader = Files.newBufferedReader(buchDateiPfad(prj), charset)) {
+    public static void buchImport(H0Wurzel wurzel) throws IllegalBuchungException {
+        try (BufferedReader reader = Files.newBufferedReader(buchDateiPfad(wurzel.getPrj()), charset)) {
             String line = null;
             while ((line = reader.readLine()) != null) {
                 wurzel.add(Buchung.parse(line));
@@ -109,12 +108,12 @@ public class Datei {
         List<Path> prjPathList = new ArrayList<>();
         // Methode aus 400 OI Tutorial Oracle.pdf S.41
         String suche = "*{" + prjSuffix + "}";
-        System.out.println(suche);
+        System.out.print("suche im Standartordnernach: " + suche + " :  ");
         Path dirP = Paths.get(dir);
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirP, suche)) {
             for (Path file : stream) {
                 prjPathList.add(file);
-                System.out.println(file.getFileName());
+                System.out.println("gefunden: " + file.getFileName());
             }
         } catch (IOException | DirectoryIteratorException x) {
             // IOException can never be thrown by the iteration.
@@ -125,27 +124,27 @@ public class Datei {
     }
 
     // erzeugt ein Projekt aus einem gegebenen Pfad
-    // schreibt den Projektordenerpfad - damit alle Daten der Anwnednung im Richtigen Ordner landen
+    // schreibt den Projektordenerpfad - damit alle Daten der Anwnednung im richtigen Ordner landen
     public static Projekt readProjekt(Path pfad) {
         String line;
         Projekt prj = null;
         // Sting aus Datei lesen
         try (BufferedReader reader = Files.newBufferedReader(pfad, charset)) {
             line = reader.readLine();
-            System.out.println(line);
+            System.out.println("gelesen: " + line);
             // mit GSon deserialisieren
             Gson gson = new Gson();
             prj = gson.fromJson(line, Projekt.class);
             prj.setPrjFolderPath(pfad.getParent());
         } catch (NoSuchFileException nf) {
-            System.err.format("IOException: %s%n" + "Leere Datenbank wird erzeugt", nf);
+            System.err.format("IOException: %s%n" + "Leere Datenbank wird erzeugt" + nf);
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
         return prj;
     }
 
-    public static void writeProjekt(Projekt prj) {
+    public static void writeProjekt(Projekt prj, boolean increment) {
 
         // Erzeugt den String mit Gson
         Gson gson = new Gson();
@@ -153,13 +152,19 @@ public class Datei {
 
         // Dir muss existieren
         try {
-            Files.createDirectories(Paths.get(dir));
+            // Files.createDirectories(Paths.get(dir));
+            // Jetzt hat das Projekt einen Pfad hinterlegt
+            Files.createDirectories(prj.getPrjFolderPath());
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
         }
 
+        // vorher Prüfung ob Incrementschritt gewünscht ist
+        // Das mach ich hier, damit sich immer darüber gedanken gemacht wird
+        if (increment) { prj.versionNrIncr(); }
+
         // Schreibt die Datei
-        try (BufferedWriter writer = Files.newBufferedWriter(projektIncrDateiPfad(prj), charset)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(prjDateiPfad(prj), charset)) {
             writer.write(line, 0, line.length());
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
@@ -169,6 +174,7 @@ public class Datei {
 
     /*
      * Standartdatei IO
+     * Aufrufe auch durch PresenterImport
      * Projektname - nur zur Info - wird nicht weiter verwendet
      * Projektpfad - wird zum Laden genutzt
      * letzterNutzer -> steht im Projekt
@@ -182,7 +188,6 @@ public class Datei {
     private static Path stdPrjDateiPfad() {
         String relPfad = dir + "standart" + ".txt";
         Path absPfad = Paths.get(relPfad).toAbsolutePath();
-        System.out.println(absPfad);
         return absPfad;
     }
 
@@ -211,12 +216,11 @@ public class Datei {
         Path pfad = null;
         try (BufferedReader reader = Files.newBufferedReader(stdPrjDateiPfad(), charset)) {
             String name = reader.readLine();
-            System.out.println(name);
             String sp = reader.readLine();
-            System.out.println(sp);
             pfad = Paths.get(sp);
+            System.out.println("IO/standart.txt: " + name + " : " + sp);
         } catch (NoSuchFileException nf) {
-            System.err.format("IOException: %s%n" + "Leere Datenbank wird erzeugt", nf);
+            System.err.format("IOException: %s%n" + " : kein Standart eingetragen" + nf);
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }

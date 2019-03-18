@@ -1,13 +1,11 @@
-package presenter;
+package gui.impDlg;
 
 import java.nio.file.*;
 import java.util.*;
 
 import javafx.collections.*;
 
-import model.*;
 import model.inOut.*;
-import view.*;
 
 public class PresenterImport {
 
@@ -16,18 +14,19 @@ public class PresenterImport {
      * __________________________________________________________________
      */
 
-    private ImportDialog importDialog;
-
+    private ViewImportDialog viewImportDialog;
     private Projekt prj;
+    boolean prjHasChanged;
 
     public PresenterImport() {
-        // leer
+        prjHasChanged = false;
     }
 
     /*
      * AUFRUFMETHODEN
      * __________________________________________________________________
      */
+    // Aufruf durch MAIN
     public Projekt getPrjStart() {
         prj = null;
         // - Standartdatei für Projektauswahl autom. laden
@@ -51,9 +50,12 @@ public class PresenterImport {
             }
         }
         // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
+        // EINSPRUNG
+        System.out.println("EINSPRUNG");
         return prj;
     }
 
+    // Aufruf durch Presenter
     public Projekt getPrjImport(Projekt wurzelPrj) {
         prj = wurzelPrj;
         // - alle vorhandenen Pfade zu Projektobjekten einlesen
@@ -63,14 +65,19 @@ public class PresenterImport {
         // -> aktuelles Wurzelprojekt hinzufügen
         if (pathList.isEmpty()) {
             // Auswahldialog starten mit aktuellem Projekt
-            prjList.add(prj);
+            // prjList.add(prj);
+            // TODO geändert - das erwartet der Nutzer eigendlich nicht
             importDialog(prjList);
         } else {
+            // TODO muss hier auch das aktuelle Projekt angezeigt werden ?
+            // nein - das erwartet der User nicht beim Knopf neu laden
             // Projekte erzeugen
             // Auswahldialog starten
             importDialog(prjSammeln(pathList, prjList));
         }
         // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
+        // EINSPRUNG
+        System.out.println("EINSPRUNG");
         return prj;
     }
 
@@ -92,24 +99,38 @@ public class PresenterImport {
     // DIALOG STARTEN
     private void importDialog(ObservableList<Projekt> prjList) {
         // Auswahldialog starten
-        ImportDialog importDialog = new ImportDialog();
+        viewImportDialog = new ViewImportDialog();
         // View initialisieren
-        importDialog.initDialog(this, prjList);
-        importDialog.showAndWait();
+        viewImportDialog.initDialog(this, prjList);
+        viewImportDialog.showAndWait();
         // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
     }
 
     /*
-     * Zugriffmethoden für Dialog
+     * Zugriffmethoden für DialogEnde
      * __________________________________________________________________
      */
 
     public void returnEnd(Projekt prj, boolean selected) {
-        // Bevor das DialogFenster aus showAndWait zurück kehrt, wird im Presenter das Projekt gesetzt
-        this.prj = prj;
+        // Bevor das DialogFenster aus showAndWait zurück kehrt, wird hier im Presenter das Projekt gesetzt
+        // Test, ob sich was überhaupt was geädert hat
+        if (this.prj != prj) {
+            this.prj = prj;
+            this.prjHasChanged = true;
+        }
         // Standart setzen
         if (selected) { Datei.stdPrjDateiSchreiben(prj); }
         // jetzt DialogStage schließen
+        viewImportDialog.close();
+        // Jetzt springt der Focus zurück zum Punkt showAndWait
+    }
+
+    /*
+     * Zugriffmethoden für Presenter
+     * __________________________________________________________________
+     */
+    public boolean prjHasChanged() {
+        return prjHasChanged;
     }
 
 }

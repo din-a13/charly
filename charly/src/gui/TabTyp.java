@@ -1,4 +1,4 @@
-package view;
+package gui;
 
 import java.text.*;
 import java.time.*;
@@ -12,8 +12,8 @@ import javafx.scene.image.*;
 import javafx.scene.layout.*;
 import javafx.util.converter.*;
 
+import gui.impDlg.*;
 import model.*;
-import presenter.*;
 
 public class TabTyp extends Tab {
 
@@ -101,14 +101,14 @@ public class TabTyp extends Tab {
         hinweisCol.setCellFactory(EditTextFieldTableCell.<Buchung, String> forTableColumn(this, new DefaultStringConverter()));
 
         // // // Collum Lösch & ÄnderungsButton
-        Image imgChangeBuchungCol = new Image("view/changeBuchung.png", 14, 14, false, false, true);
+        Image imgChangeBuchungCol = new Image("gui/changeBuchung.png", 14, 14, false, false, true);
         ImageView iconChangeBuchungCol = new ImageView();
         iconChangeBuchungCol.setImage(imgChangeBuchungCol);
         btnCol.setGraphic(iconChangeBuchungCol);
         btnCol.setMaxWidth(View.SPACE * 8);
         btnCol.setMinWidth(View.SPACE * 8);
         btnCol.setSortable(false);
-        Image imgChangeBuchungBtn = new Image("view/deleteBuchung.png", 7, 7, false, false, true);
+        Image imgChangeBuchungBtn = new Image("gui/deleteBuchung.png", 7, 7, false, false, true);
         btnCol.setCellFactory(new BtnCellFactory(this, imgChangeBuchungBtn, View.SPACE * 5)); // kann Die Größe des
                                                                                               // Button anpassen
         // // // Tabelle zusammenstecken
