@@ -137,7 +137,7 @@ public class Datei {
             prj = gson.fromJson(line, Projekt.class);
             prj.setPrjFolderPath(pfad.getParent());
         } catch (NoSuchFileException nf) {
-            System.err.format("IOException: %s%n" + "Leere Datenbank wird erzeugt" + nf);
+            System.err.format("IOException: %s%n" + "Leere Datenbank wird erzeugt", nf);
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
@@ -220,7 +220,7 @@ public class Datei {
             pfad = Paths.get(sp);
             System.out.println("IO/standart.txt: " + name + " : " + sp);
         } catch (NoSuchFileException nf) {
-            System.err.format("IOException: %s%n" + " : kein Standart eingetragen" + nf);
+            System.err.format("IOException: %s%n" + " : kein Standart eingetragen", nf);
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }

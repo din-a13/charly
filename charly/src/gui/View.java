@@ -50,9 +50,9 @@ public class View extends HBox {
 
         // Seitenleiste
         VBox nutzer = new VBox();
-        VBox io = new VBox();
+        VBox setting = new VBox();
         seiteBP.setTop(nutzer);
-        seiteBP.setBottom(io);
+        seiteBP.setBottom(setting);
         seiteBP.setPadding(SPACEAROUND);
 
         // // Heldenauswahl
@@ -73,16 +73,29 @@ public class View extends HBox {
         heldenMenu.setPrefWidth(EINGABEBREITE * 4);
         heldenMenu.setPopupSide(Side.RIGHT);
 
-        // // Import Export
-        Button importieren = new Button("neu Laden");
-        Button exportieren = new Button("Speichern");
-        io.getChildren().addAll(exportieren, importieren);
-        io.setSpacing(SPACE);
-        importieren.setPrefWidth(EINGABEBREITE * 4);
-        exportieren.setPrefWidth(EINGABEBREITE * 4);
-        // // Listener
-        importieren.setOnAction(e -> presenter.Import());
-        exportieren.setOnAction(e -> presenter.Export());
+        // // Datei Menu
+        MenuButton dateiMenu = new MenuButton("Datei");
+        dateiMenu.setPrefWidth(EINGABEBREITE * 4);
+        dateiMenu.setPopupSide(Side.RIGHT);
+        MenuItem imp = new MenuItem("neu laden");
+        imp.setOnAction((e) -> presenter.Import());
+        MenuItem exp = new MenuItem("neu laden");
+        exp.setOnAction((e) -> presenter.Export());
+        dateiMenu.getItems().addAll(imp, exp);
+
+        /*
+         * TODO nicht mehr gewollt
+         * // // Import Export
+         * Button importieren = new Button("neu Laden");
+         * Button exportieren = new Button("Speichern");
+         * importieren.setPrefWidth(EINGABEBREITE * 4);
+         * exportieren.setPrefWidth(EINGABEBREITE * 4);
+         * // // Listener
+         * importieren.setOnAction(e -> presenter.Import());
+         * exportieren.setOnAction(e -> presenter.Export());
+         */
+        setting.getChildren().addAll(dateiMenu);
+        setting.setSpacing(SPACE);
 
         // TabFeld einrichten
         tabFeld.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);

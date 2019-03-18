@@ -114,9 +114,9 @@ public class Presenter {
                     // Nur MonatsSummenBuchung
                     if (b.getClass().toString().equals("class model.SummenBuchung") && b.getDate().getSecond() == 2) {
 
-                        // Werte sammeln
+                        // Werte sammeln - mit verkehrtem VORZEICHEN
                         String m = datumFormat(b.getDate().getYear(), b.getDate().getMonthValue());
-                        double d = b.getBetrag().get();
+                        double d = b.getBetrag().get() * -1;
                         XYChart.Data<String, Number> datenPunkt = new XYChart.Data<>(m, d);
                         datenListe.add(datenPunkt);
 
