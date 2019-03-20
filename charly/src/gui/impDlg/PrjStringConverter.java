@@ -20,8 +20,11 @@ public class PrjStringConverter extends StringConverter<Projekt> {
 
         // Auwahl des richtigen Projektes aus der Liste
         // Wenn nicht enthalten, dann erzeuge ein neues leeres Projekt mit dem Eingabenamen
+        String[] happen = eingabe.split("(");
+        String eingabeName = happen[0].trim();
+        int eingabeVrs = Integer.parseInt(happen[1].substring(0, happen[1].length()));
         for (Projekt p : auswahl.getItems()) {
-            if (p.name().equals(eingabe)) { return p; }
+            if (p.name().equals(eingabeName) && p.versionNr() == eingabeVrs) { return p; }
         }
         return Projekt.getProjektStandart(eingabe);
     }
@@ -29,7 +32,7 @@ public class PrjStringConverter extends StringConverter<Projekt> {
     @Override
     public String toString(Projekt prj) {
         if (prj != null) {
-            return prj.name();
+            return prj.name() + " (" + prj.versionNr() + ")";
         } else {
             return "";
         }

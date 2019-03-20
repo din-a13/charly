@@ -62,7 +62,7 @@ public class ViewImportDialog extends Stage {
                         if (item == null || empty) {
                             setGraphic(null);
                         } else {
-                            setText(item.name());
+                            setText(item.name() + " (" + item.versionNr() + ")");
                         }
                     }
                 };

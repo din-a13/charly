@@ -62,7 +62,9 @@ public class Datei {
      */
     public static void buchExport(H0Wurzel wurzel) {
         // vor jedem Speichern wird die Version der Buchungsdatei erhöht
+        // Falls das Projekt noch auf vrs=0 steht wird diese jetzt auf 1 erhöht - sonnst ist das nicht intuitiv
         wurzel.getPrj().buchIdxIncr();
+        if (wurzel.getPrj().versionNr() == 0 && wurzel.getPrj().buchIdx() > 0) { wurzel.getPrj().versionNrIncr(); }
 
         // Dir muss existieren
         try {

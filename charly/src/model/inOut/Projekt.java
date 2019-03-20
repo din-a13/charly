@@ -17,8 +17,8 @@ public class Projekt implements Serializable {
 
     // PROJEKTATTRIBUTE
     private String projektName;
-    private int versionNr = 0;
-    private int buchIdx = -1; // vor dem ersten Schreiben wird um 1 erhöht
+    private int versionNr = 0; // erhöht wird nur auf Wunsch - i.d.R. aber min. ein mal!
+    private int buchIdx = 0; // vor dem ersten Schreiben wird um 1 erhöht
     private String[] HELDEN;
     private String[] TYPEN;
     private int[] JAHRE = { 0, 0 };
@@ -98,7 +98,6 @@ public class Projekt implements Serializable {
 
     void versionNrIncr() {
         versionNr++;
-        projektName += ("." + Datei.int3Strg(versionNr));
     }
 
     void buchIdxIncr() {

@@ -65,7 +65,12 @@ public class Presenter {
 
     private void setTitle() {
         if (primaryStage != null) {
-            primaryStage.setTitle("Charly        ||Projekt:  " + wurzel.getPrj().name() + " |Version: " + wurzel.getPrj().versionNr() + " |Index: " + wurzel.getPrj().buchIdx());
+
+            // Wenn das Projekt noch nie gespeichert wurde, trägt es vrs=0 und idx=0 dann soll aber jeweils "--"
+            // angezeigt werden
+            String vrs = (wurzel.getPrj().versionNr() == 0) ? "--" : Integer.toString(wurzel.getPrj().versionNr());
+            String idx = (wurzel.getPrj().buchIdx() == 0) ? "--" : Integer.toString(wurzel.getPrj().buchIdx());
+            primaryStage.setTitle("Charly        ||Projekt:  " + wurzel.getPrj().name() + "  |Version: " + vrs + "  |Index: " + idx);
         }
     }
     /*
