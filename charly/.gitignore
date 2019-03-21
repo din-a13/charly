@@ -1,4 +1,6 @@
 /bin/
-*.gitignore
-*.project
-*.txt
+/.gitignore
+/.classpath
+/.project
+/*.txt
+/.DS_Store

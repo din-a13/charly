@@ -4,6 +4,7 @@ import java.nio.file.*;
 import java.util.*;
 
 import javafx.collections.*;
+import javafx.stage.*;
 
 import model.inOut.*;
 
@@ -109,11 +110,12 @@ public class PresenterImport {
     }
 
     /*
-     * Zugriffmethoden für DialogEnde
+     * Zugriffmethoden für Dialog
      * __________________________________________________________________
      */
 
-    public void returnEnd(Projekt prj, boolean selected) {
+    // nach Beenden des Importdialog wird diese aufgerufen
+    void returnEnd(Projekt prj, boolean selected) {
         // Bevor das DialogFenster aus showAndWait zurück kehrt, wird hier im Presenter das Projekt gesetzt
         // Test, ob sich was überhaupt was geädert hat
         if (this.prj != prj && prj != null) {
@@ -125,6 +127,26 @@ public class PresenterImport {
         // jetzt DialogStage schließen
         viewImportDialog.close();
         // Jetzt springt der Focus zurück zum Punkt showAndWait
+    }
+
+    // beim Klicken des "Laden"-Button
+    void fileChooser() {
+
+        // Das ausgewählte Projekt soll in der ComboBox angezeigt werden, bleibt aber in seinem Ordner
+        // Damit es beim nächsten Programmstart nicht wieder vergessen ist, muss die Checkbox Standart aktiviert werden
+        FileChooser fileChooser = new FileChooser();
+        Stage choose = new Stage();
+        Path prjPath = fileChooser.showOpenDialog(choose).toPath();
+
+        // Prüfung ob die Dateiendung stimmt
+        if (prjPath != null && prjPath.endsWith("*.prj.txt")) {
+            System.out.println(prjPath);
+
+            // Projekt erzeugen und hinzufügen
+            viewImportDialog.addPrjFile(Datei.readProjekt(prjPath));
+            return;
+        }
+        System.out.println("Ich konnte die Datei nicht als Projekt laden");
     }
 
     /*

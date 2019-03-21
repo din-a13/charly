@@ -60,6 +60,7 @@ public class Datei {
      * Wenn Buchung importiert wird, ist vorher bereits ein Projekt oder eine ganze Projektliste importiert worden
      * __________________________________________________________________
      */
+
     public static void buchExport(H0Wurzel wurzel) {
         // vor jedem Speichern wird die Version der Buchungsdatei erhöht
         // Falls das Projekt noch auf vrs=0 steht wird diese jetzt auf 1 erhöht - sonnst ist das nicht intuitiv
@@ -89,7 +90,12 @@ public class Datei {
         }
         // Projekt auch abspeichern
         writeProjekt(wurzel.getPrj(), false);
+    }
 
+    // Ansprache durch den Presenter -> Importbutton
+    public static void buchExport(H0Wurzel wurzel, Path dirPath) {
+        wurzel.getPrj().setPrjFolderPath(dirPath);
+        buchExport(wurzel);
     }
 
     public static void buchImport(H0Wurzel wurzel) throws IllegalBuchungException {
@@ -178,7 +184,6 @@ public class Datei {
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
-
     }
 
     /*

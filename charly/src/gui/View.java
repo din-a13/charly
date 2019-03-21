@@ -77,11 +77,17 @@ public class View extends HBox {
         MenuButton dateiMenu = new MenuButton("Datei");
         dateiMenu.setPrefWidth(EINGABEBREITE * 4);
         dateiMenu.setPopupSide(Side.RIGHT);
-        MenuItem imp = new MenuItem("neu laden");
+
+        MenuItem imp = new MenuItem("Projekt öffnen");
         imp.setOnAction((e) -> presenter.Import());
-        MenuItem exp = new MenuItem("speichern");
-        exp.setOnAction((e) -> presenter.Export());
-        dateiMenu.getItems().addAll(imp, exp);
+
+        MenuItem buchSpeich = new MenuItem("Buchungen speichern");
+        buchSpeich.setOnAction((e) -> presenter.buchungenSpeichern());
+
+        MenuItem exp = new MenuItem("Projekt exportieren");
+        exp.setOnAction((e) -> presenter.prjExp());
+
+        dateiMenu.getItems().addAll(imp, new SeparatorMenuItem(), buchSpeich, exp);
 
         /*
          * TODO nicht mehr gewollt

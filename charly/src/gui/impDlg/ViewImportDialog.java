@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.*;
-import javafx.util.*;
 
 import gui.*;
 import model.inOut.*;
@@ -52,22 +51,7 @@ public class ViewImportDialog extends Stage {
         // // ComboBox
         auswahl = new ComboBox<>();
         auswahl.setPromptText("Hier wählen oder tippen");
-        auswahl.setCellFactory(new Callback<ListView<Projekt>, ListCell<Projekt>>() {
-            @Override
-            public ListCell<Projekt> call(ListView<Projekt> p) {
-                return new ListCell<Projekt>() {
-                    @Override
-                    protected void updateItem(Projekt item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item == null || empty) {
-                            setGraphic(null);
-                        } else {
-                            setText(item.name() + " (" + item.versionNr() + ")");
-                        }
-                    }
-                };
-            }
-        });
+        auswahl.setCellFactory(new PrjCellFactory());
         // // Nutzeingabe
         auswahl.setEditable(true);
         auswahl.setPrefWidth(Double.MAX_VALUE);
@@ -78,14 +62,12 @@ public class ViewImportDialog extends Stage {
         // // Platzieren
         dialogEingabe.add(auswahl, 0, 1, 3, 1);
 
-        // TODO FileChooser
-        // Das ausgewählte Projekt soll in der ComboBox angezeigt werden
-        // Das gefundene Projekt wird automatisch in den IO Ordner kopiert
-        // Auch Buchungsdatei muss kopiert werden
+        // FileChooser
         Button fileChsBtn = new Button("Datei suchen");
         fileChsBtn.setMaxWidth(Double.MAX_VALUE);
         GridPane.setHgrow(fileChsBtn, Priority.ALWAYS);
         GridPane.setHalignment(fileChsBtn, HPos.RIGHT);
+        fileChsBtn.setOnAction(e -> presenterImport.fileChooser());
         dialogEingabe.add(fileChsBtn, 3, 1);
 
         // Checkbox
@@ -148,8 +130,13 @@ public class ViewImportDialog extends Stage {
      * __________________________________________________________________
      */
 
-    public void initDialog(PresenterImport presenterImport, ObservableList<Projekt> prjList) {
+    void initDialog(PresenterImport presenterImport, ObservableList<Projekt> prjList) {
         this.presenterImport = presenterImport;
         auswahl.setItems(prjList);
     }
+
+    void addPrjFile(Projekt prj) {
+        auswahl.getItems().add(prj);
+    }
+
 }

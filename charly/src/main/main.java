@@ -29,8 +29,9 @@ public class main extends Application {
          */
 
         PresenterImport presenterImport = new PresenterImport();
-        prj = presenterImport.getPrjStart();
-
+        while (prj == null) {
+            prj = presenterImport.getPrjStart();
+        }
         /*
          * Wurzel initieren,
          * Einlesen der verschiedenen Grunddaten (durchWurzel)

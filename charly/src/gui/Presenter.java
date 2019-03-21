@@ -263,8 +263,23 @@ public class Presenter {
     }
 
     // Export Button / "Speichern"
-    public void Export() {
-        // TODO Auto-generated method stub
+    public void buchungenSpeichern() {
+        // Buchungen speichern, ohne increment
+        Datei.buchExport(wurzel);
+    }
+
+    // Export Button / "Speichern"
+    public void prjExp() {
+        // benötigt wird ein Verzeichniss zum Speichern
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        Stage choose = new Stage();
+        Path dirPath = dirChooser.showDialog(choose).toPath();
+
+        if (dirPath != null) {
+            System.out.println("Ausgewähltes Verzeichniss: " + dirPath);
+            // Buchungen und Projekt speichern (dabei ohne increment)
+            Datei.buchExport(wurzel, dirPath);
+        }
     }
 
     // Auffinden der HeldenIcon
