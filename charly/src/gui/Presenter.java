@@ -221,12 +221,16 @@ public class Presenter {
      * __________________________________________________________________
      */
 
-    public void heldenWechsel(String aktHeld, Tab aktTab) {
+    void heldenWechsel(String aktHeld, Tab aktTab) {
         this.aktHeld = aktHeld;
         if (aktTab.getClass().toString().equals("class gui.TabTyp")) {
             String aktTyp = aktTab.getText();
             tabellenAnsichtNeu((TabTyp) aktTab);
         }
+    }
+
+    void neuerHeld() {
+        // TODO
     }
 
     /*

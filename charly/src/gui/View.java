@@ -77,13 +77,10 @@ public class View extends HBox {
         MenuButton dateiMenu = new MenuButton("Datei");
         dateiMenu.setPrefWidth(EINGABEBREITE * 4);
         dateiMenu.setPopupSide(Side.RIGHT);
-
         MenuItem imp = new MenuItem("Projekt öffnen");
         imp.setOnAction((e) -> presenter.Import());
-
-        MenuItem buchSpeich = new MenuItem("Buchungen speichern");
+        MenuItem buchSpeich = new MenuItem("Projekt speichern");
         buchSpeich.setOnAction((e) -> presenter.buchungenSpeichern());
-
         MenuItem exp = new MenuItem("Projekt exportieren");
         exp.setOnAction((e) -> presenter.prjExp());
 
@@ -122,6 +119,9 @@ public class View extends HBox {
             neu.setOnAction((e) -> heldenWechsel(e, heldenMenu, heldenBild));
             heldenMenu.getItems().add(neu);
         }
+        MenuItem neuerHeld = new CheckMenuItem("neuer Held");
+        neuerHeld.setOnAction((e) -> presenter.neuerHeld());
+        heldenMenu.getItems().addAll(new SeparatorMenuItem(), neuerHeld);
     }
 
     // Tab -> Typen löschen und setzen

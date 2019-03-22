@@ -27,6 +27,7 @@ public class PresenterImport {
      * AUFRUFMETHODEN
      * __________________________________________________________________
      */
+
     // Aufruf durch MAIN
     public Projekt getPrjStart() {
         prj = null;
@@ -56,7 +57,7 @@ public class PresenterImport {
         return prj;
     }
 
-    // Aufruf durch Presenter
+    // Aufruf durch PRESENTER
     public Projekt getPrjImport(Projekt wurzelPrj) {
         prj = wurzelPrj;
         // - alle vorhandenen Pfade zu Projektobjekten einlesen
@@ -72,8 +73,7 @@ public class PresenterImport {
             importDialog(prjList);
         } else {
             // muss hier auch das aktuelle Projekt angezeigt werden ?
-            // nein - das erwartet der User nicht beim Knopf neu laden
-            // TODO - prüfen, dadurch dass jetzt standartmäßig gespeicher wird, iwrd auch das aktuelle Projekt angezeigt
+            // dadurch dass jetzt standartmäßig gespeicher wird, iwrd auch das aktuelle Projekt angezeigt
 
             // Projekte erzeugen & Auswahldialog starten
             importDialog(prjSammeln(pathList, prjList));
