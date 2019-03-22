@@ -5,6 +5,8 @@ import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 
+import javafx.collections.*;
+
 import com.google.gson.*;
 
 import model.*;
@@ -29,19 +31,12 @@ public class Datei {
     // Dateipfade zusammengesetzt aus ProjektFolder, Projektname, Version/ Index und Suffix
 
     private static Path prjDateiPfad(Projekt prj) {
-        // String relPfad = dir + prj.name() + "." + int3Strg(prj.versionNr()) + prjSuffix;
-        // Path absPfad = Paths.get(relPfad).toAbsolutePath();
-
         // Jetzt hat das Projekt einen Pfad hinterlegt
         Path absPfad = prj.getPrjFolderPath().resolve(prj.name() + "." + int3Strg(prj.versionNr()) + prjSuffix);
         return absPfad;
     }
 
     private static Path buchDateiPfad(Projekt prj) {
-        // String relPfad = dir + prj.name() + "." + int3Strg(prj.versionNr()) + "." + int3Strg(prj.buchIdx()) +
-        // bchSuffix;
-        // Path absPfad = Paths.get(relPfad).toAbsolutePath();
-
         // Jetzt hat das Projekt einen Pfad hinterlegt
         Path absPfad = prj.getPrjFolderPath().resolve(prj.name() + "." + int3Strg(prj.versionNr()) + "." + int3Strg(prj.buchIdx()) + bchSuffix);
         return absPfad;
@@ -117,9 +112,14 @@ public class Datei {
      * __________________________________________________________________
      */
 
-    // sucht im Standart io-Ordner (siehe oben final Atribut)
-    // erzeugt eine Liste aller vorhandenn Projektpfade
-    public static List<Path> prjPathList() {
+    public static void changePrjName(H0Wurzel wurzel, String name) {
+        wurzel.getPrj().setName(name);
+        buchExport(wurzel);
+    }
+
+    public static ObservableList<Projekt> prjSammeln() {
+        // sucht im Standart io-Ordner (siehe oben final Atribut)
+        // erzeugt eine Liste aller vorhandenn Projektpfade
         List<Path> prjPathList = new ArrayList<>();
         // Methode aus 400 OI Tutorial Oracle.pdf S.41
         String suche = "*{" + prjSuffix + "}";
@@ -135,7 +135,16 @@ public class Datei {
             // In this snippet, it can only be thrown by newDirectoryStream.
             System.err.println(x);
         }
-        return prjPathList;
+
+        // versucht die Projekte an diesen Pfaden zu lesen
+        // schreibt das Ergebniss in eine weitere Liste
+        ObservableList<Projekt> prjList = FXCollections.observableArrayList();
+        for (Path pth : prjPathList) {
+            Projekt pr = null;
+            pr = Datei.readProjekt(pth);
+            if (pr != null) { prjList.add(pr); }
+        }
+        return prjList;
     }
 
     // erzeugt / liest ein Projekt aus einem gegebenen Pfad
@@ -155,7 +164,10 @@ public class Datei {
             System.err.format("IOException: %s%n" + "Leere Datenbank wird erzeugt", nf);
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
+        } catch (Exception y) {
+            System.err.format("Fehler beim lesen einer Projektdatei: %s%n", y);
         }
+
         return prj;
     }
 
@@ -237,6 +249,8 @@ public class Datei {
             System.err.format("IOException: %s%n" + " : kein Standart eingetragen", nf);
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
+        } catch (Exception y) {
+            System.err.format("Fehler bei Auswertung der standart.txt: %s%n", y);
         }
         return pfad;
     }

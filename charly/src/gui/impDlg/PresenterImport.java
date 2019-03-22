@@ -1,11 +1,11 @@
 package gui.impDlg;
 
+import java.io.*;
 import java.nio.file.*;
-import java.util.*;
 
-import javafx.collections.*;
 import javafx.stage.*;
 
+import model.*;
 import model.inOut.*;
 
 public class PresenterImport {
@@ -31,82 +31,47 @@ public class PresenterImport {
     // Aufruf durch MAIN
     public Projekt getPrjStart() {
         prj = null;
-        // - Standartdatei für Projektauswahl autom. laden
-        Path path = Datei.stdPrjPath(); // gibt null zurück, wenn keine Std gesetzt ist
-        // Deserialisierung, wenn nicht null
+        // Standartdatei für Projektauswahl suchen
+        // gibt null zurück, wenn die Standartdatei nicht auffindbar ist
+        // Wenn diese auffindbar ist, wird gelesen
+        Path path = Datei.stdPrjPath();
         if (path != null) {
             prj = Datei.readProjekt(path);
-            if (prj == null) { prj = Projekt.getProjektStandart(); }
-        } else {
-            // Wenn kein Standart gespeichert ist, oder nicht auffindbar (null):
-            // - alle vorhandenen Pfade zu Projektobjekten einlesen
-            List<Path> pathList = new ArrayList<>(Datei.prjPathList());
-            ObservableList<Projekt> prjList = FXCollections.observableArrayList();
-            // wenn keine Projektdateien vorhanden -> Standartprojekt
-            if (pathList.isEmpty()) {
-                prj = Projekt.getProjektStandart();
-            } else {
-                // Projekte erzeugen
-                // Auswahldialog starten
-                importDialog(prjSammeln(pathList, prjList));
-            }
+            if (prj != null) { return prj; }
         }
+        // Wenn die Standartdatei nicht gefunden / gelesen werden konnte:
+        // oder das in der Stadartdaei enthalten prj nicht gelesen werden konnte,
+        // geht es Richtung Dialog weiter -> wenn keine Projektobjekte da sind
+        // eine leere Liste an Auswahldialog übergeben
+        viewImportDialog = new ViewImportDialog();
+        viewImportDialog.initDialog(this, Datei.prjSammeln());
+        viewImportDialog.showAndWait();
         // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
-        // EINSPRUNG
-        System.out.println("EINSPRUNG");
+        System.out.println("EINSPRUNG mit : " + prj);
+        if (prj == null) { return Projekt.getProjektStandart(); }
         return prj;
     }
 
     // Aufruf durch PRESENTER
-    public Projekt getPrjImport(Projekt wurzelPrj) {
-        prj = wurzelPrj;
-        // - alle vorhandenen Pfade zu Projektobjekten einlesen
-        List<Path> pathList = new ArrayList<>(Datei.prjPathList());
-        ObservableList<Projekt> prjList = FXCollections.observableArrayList();
-        // wenn keine Projektdateien vorhanden
-        // -> aktuelles Wurzelprojekt hinzufügen
-        if (pathList.isEmpty()) {
-            // Auswahldialog starten mit aktuellem Projekt
-            // TODO prüfen - das erwartet der Nutzer eigendlich nicht
-            prjList.add(prj);
+    public Projekt getPrjImport(H0Wurzel wurzel) {
+        // Sicherheitshalber wird das aktuelle Projekt exportiert
+        // Dadurch taucht es auch in der Auswahlliste des Dialogs auf
+        Datei.buchExport(wurzel);
 
-            importDialog(prjList);
-        } else {
-            // muss hier auch das aktuelle Projekt angezeigt werden ?
-            // dadurch dass jetzt standartmäßig gespeicher wird, iwrd auch das aktuelle Projekt angezeigt
-
-            // Projekte erzeugen & Auswahldialog starten
-            importDialog(prjSammeln(pathList, prjList));
-        }
-        // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
-        // EINSPRUNG
-        System.out.println("EINSPRUNG");
-        return prj;
-    }
-
-    /*
-     * private Hilfs METHODEN
-     * __________________________________________________________________
-     */
-
-    // PROJEKTE einlesen
-    private ObservableList<Projekt> prjSammeln(List<Path> pathList, ObservableList<Projekt> prjList) {
-        for (Path pth : pathList) {
-            Projekt pr = null;
-            pr = Datei.readProjekt(pth);
-            if (pr != null) { prjList.add(pr); }
-        }
-        return prjList;
-    }
-
-    // DIALOG STARTEN
-    private void importDialog(ObservableList<Projekt> prjList) {
-        // Auswahldialog starten
+        Projekt altesPrj = wurzel.getPrj();
+        prj = altesPrj;
+        // alle vorhandenen Pfade zu Projektobjekten einlesen
+        // dadurch dass jetzt standartmäßig durch den Presenter gespeicher wird,
+        // wird auch das aktuelle Projekt in der Liste auftauchen
         viewImportDialog = new ViewImportDialog();
-        // View initialisieren
-        viewImportDialog.initDialog(this, prjList);
-        viewImportDialog.showAndWait();
-        // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
+        viewImportDialog.initDialog(this, Datei.prjSammeln());
+        viewImportDialog.showAndWait(); // die View setzt vor dem Schließen im Presenter das Projekt richtig ein
+        // EINSPRUNG
+        System.out.println("EINSPRUNG mit : " + prj);
+        // nur wenn es eine Änderung gab, gibt die Methode etwas != null zurück
+        if (prj != altesPrj) { return prj; }
+        // sonnst
+        return null;
     }
 
     /*
@@ -131,30 +96,21 @@ public class PresenterImport {
 
     // beim Klicken des "Laden"-Button
     void fileChooser() {
-
-        // Das ausgewählte Projekt soll in der ComboBox angezeigt werden, bleibt aber in seinem Ordner
-        // Damit es beim nächsten Programmstart nicht wieder vergessen ist, muss die Checkbox Standart aktiviert werden
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Projekt suchen");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Charly-Projekte", "*.prj.txt"), new FileChooser.ExtensionFilter("Charly-Buchungen", "*.bch.txt"));
         Stage choose = new Stage();
-        Path prjPath = fileChooser.showOpenDialog(choose).toPath();
-
-        // Prüfung ob die Dateiendung stimmt
-        if (prjPath != null && prjPath.endsWith("*.prj.txt")) {
-            System.out.println(prjPath);
-
-            // Projekt erzeugen und hinzufügen
-            viewImportDialog.addPrjFile(Datei.readProjekt(prjPath));
-            return;
+        File file = fileChooser.showOpenDialog(choose);
+        if (file != null) {
+            Path prjPath = file.toPath();
+            // Prüfung ob die Dateiendung stimmt
+            if (prjPath != null) {
+                System.out.println(prjPath);
+                // Projekt erzeugen und hinzufügen
+                viewImportDialog.addPrjFile(Datei.readProjekt(prjPath));
+                return;
+            }
         }
         System.out.println("Ich konnte die Datei nicht als Projekt laden");
     }
-
-    /*
-     * Zugriffmethoden für Presenter
-     * __________________________________________________________________
-     */
-    public boolean prjHasChanged() {
-        return prjHasChanged;
-    }
-
 }

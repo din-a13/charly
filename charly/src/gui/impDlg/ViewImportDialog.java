@@ -21,6 +21,7 @@ public class ViewImportDialog extends Stage {
     private PresenterImport presenterImport;
     private GridPane dialogEingabe;
     private ComboBox<Projekt> auswahl;
+    private CheckBox standart;
 
     /*
      * ______0 SPALTE ______ 1 SPALTE ______ 2 SPALTE ______ 3 SPALTE ______
@@ -42,7 +43,7 @@ public class ViewImportDialog extends Stage {
         // dialogEingabe.setGridLinesVisible(true);
 
         // // Hinweistext
-        Label aufforderung = new Label(" Wähle ein vorhandes Projekt aus, oder gib einen Projektnamen ein um ein neues Projekt zu erzeugen. ");
+        Label aufforderung = new Label(" Wähle ein vorhandes Projekt aus, oder gib einen Projektnamen ein um ein neues Projekt zu erzeugen. (erlaubte Sonderzeichen: +-_()");
         aufforderung.setWrapText(true);
         aufforderung.setTextAlignment(TextAlignment.CENTER);
         aufforderung.setPadding(new Insets(View.SPACE * 3, View.SPACE, View.SPACE * 3, View.SPACE));
@@ -51,19 +52,19 @@ public class ViewImportDialog extends Stage {
         // // ComboBox
         auswahl = new ComboBox<>();
         auswahl.setPromptText("Hier wählen oder tippen");
-        auswahl.setCellFactory(new PrjCellFactory());
+        PrjStringConverter converter = new PrjStringConverter(auswahl);
+        auswahl.setConverter(converter);
+        auswahl.setCellFactory(new PrjCellFactory(converter));
         // // Nutzeingabe
         auswahl.setEditable(true);
         auswahl.setPrefWidth(Double.MAX_VALUE);
         GridPane.setHgrow(auswahl, Priority.ALWAYS);
-        PrjStringConverter converter = new PrjStringConverter(auswahl);
-        auswahl.setConverter(converter);
 
         // // Platzieren
         dialogEingabe.add(auswahl, 0, 1, 3, 1);
 
         // FileChooser
-        Button fileChsBtn = new Button("Datei suchen");
+        Button fileChsBtn = new Button("Projekt suchen");
         fileChsBtn.setMaxWidth(Double.MAX_VALUE);
         GridPane.setHgrow(fileChsBtn, Priority.ALWAYS);
         GridPane.setHalignment(fileChsBtn, HPos.RIGHT);
@@ -72,7 +73,7 @@ public class ViewImportDialog extends Stage {
 
         // Checkbox
         Label text = new Label("als Standart");
-        CheckBox standart = new CheckBox();
+        standart = new CheckBox();
         standart.setAllowIndeterminate(false);
         GridPane.setHalignment(text, HPos.RIGHT);
         GridPane.setHalignment(standart, HPos.RIGHT);
@@ -137,6 +138,10 @@ public class ViewImportDialog extends Stage {
 
     void addPrjFile(Projekt prj) {
         auswahl.getItems().add(prj);
+        auswahl.getSelectionModel().select(prj);
+        // Damit es beim nächsten Programmstart nicht wieder vergessen ist,
+        // soll die Checkbox Standart aktiviert werden
+        standart.setSelected(true);
     }
 
 }

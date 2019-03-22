@@ -2,7 +2,6 @@ package gui;
 
 import java.util.*;
 
-import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.control.*;
 import javafx.scene.control.TabPane.*;
@@ -36,6 +35,10 @@ public class View extends HBox {
     // Heldenauswahl
     ImageView heldenBild;
     MenuButton heldenMenu;
+    ToggleGroup heldenToggle;
+    // AnpassenMenu
+    Menu heldXxMenue;
+    Menu typXxMenue;
 
     public View(Presenter presenter) {
         this.presenter = presenter;
@@ -55,7 +58,7 @@ public class View extends HBox {
         seiteBP.setBottom(setting);
         seiteBP.setPadding(SPACEAROUND);
 
-        // // Heldenauswahl
+        // // Heldenauswahlfeld
         heldenBild = new ImageView();
         Separator hS = new Separator();
         heldenMenu = new MenuButton("Held");
@@ -72,6 +75,8 @@ public class View extends HBox {
         // // // Helden Menu
         heldenMenu.setPrefWidth(EINGABEBREITE * 4);
         heldenMenu.setPopupSide(Side.RIGHT);
+        heldenToggle = new ToggleGroup();
+        heldenToggle.selectedToggleProperty().addListener((ov, oldToggle, newToggle) -> heldenWechsel(newToggle));
 
         // // Datei Menu
         MenuButton dateiMenu = new MenuButton("Datei");
@@ -83,57 +88,59 @@ public class View extends HBox {
         buchSpeich.setOnAction((e) -> presenter.buchungenSpeichern());
         MenuItem exp = new MenuItem("Projekt exportieren");
         exp.setOnAction((e) -> presenter.prjExp());
-
+        dateiMenu.setPopupSide(Side.RIGHT);
         dateiMenu.getItems().addAll(imp, new SeparatorMenuItem(), buchSpeich, exp);
 
-        /*
-         * TODO nicht mehr gewollt
-         * // // Import Export
-         * Button importieren = new Button("neu Laden");
-         * Button exportieren = new Button("Speichern");
-         * importieren.setPrefWidth(EINGABEBREITE * 4);
-         * exportieren.setPrefWidth(EINGABEBREITE * 4);
-         * // // Listener
-         * importieren.setOnAction(e -> presenter.Import());
-         * exportieren.setOnAction(e -> presenter.Export());
-         */
-        setting.getChildren().addAll(dateiMenu);
+        // // AnpassenMenu
+        MenuButton anpassenMenu = new MenuButton("Projekt");
+        anpassenMenu.setPrefWidth(EINGABEBREITE * 4);
+        anpassenMenu.setPopupSide(Side.RIGHT);
+        MenuItem nameAndern = new MenuItem("Projektname ändern");
+        nameAndern.setOnAction((e) -> presenter.prjNameAndern());
+        MenuItem neuerHeld = new MenuItem("neuer Held");
+        neuerHeld.setOnAction((e) -> presenter.neuerHeld());
+        heldXxMenue = new Menu("leere Helden löschen");
+        MenuItem neuerTyp = new MenuItem("neuer Tab");
+        neuerTyp.setOnAction((e) -> presenter.neuerTyp());
+        typXxMenue = new Menu("leere Tabs löschen");
+        anpassenMenu.getItems().addAll(nameAndern, new SeparatorMenuItem(), neuerHeld, heldXxMenue, new SeparatorMenuItem(), neuerTyp, typXxMenue);
+
+        // // Setting Bereich füllen
+        setting.getChildren().addAll(dateiMenu, anpassenMenu);
         setting.setSpacing(SPACE);
 
         // TabFeld einrichten
         tabFeld.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         tabFeld.setTabMinWidth(EINGABEBREITE * 4);
-
     }
 
     /*
      * Initialisierung durch Presenter
      * __________________________________________________________________
      */
-    // Helden löschen und setzen
-    void setHelden(String[] HELDEN) {
+    // Helden und HeldenXx löschen und setzen
+    void setHelden(String[] HELDEN, String[] heldenXx) {
         heldenMenu.getItems().clear();
+        // heldenToggle.getToggles().clear();
         for (int i = 0; i < HELDEN.length; i++) {
-            MenuItem neu = new CheckMenuItem(HELDEN[i]);
-            // Listener anmelden
-            neu.setOnAction((e) -> heldenWechsel(e, heldenMenu, heldenBild));
+            RadioMenuItem neu = new RadioMenuItem(HELDEN[i]);
+            neu.setToggleGroup(heldenToggle);
             heldenMenu.getItems().add(neu);
         }
-        MenuItem neuerHeld = new CheckMenuItem("neuer Held");
-        neuerHeld.setOnAction((e) -> presenter.neuerHeld());
-        heldenMenu.getItems().addAll(new SeparatorMenuItem(), neuerHeld);
+        heldXxMenue.getItems().clear();
+        for (int i = 0; i < heldenXx.length; i++) {
+            MenuItem neuXx = new MenuItem("Xx " + heldenXx[i]);
+            neuXx.setOnAction((e) -> presenter.heldEntfernen(e));
+            heldXxMenue.getItems().add(neuXx);
+        }
     }
 
     // Tab -> Typen löschen und setzen
-    void setTypen(String[] TYPEN) {
-        // Typen
+    void setTypen(String[] TYPEN, String[] typenXX) {
         tabFeld.getTabs().clear();
         tabListe.clear();
         for (int j = 0; j < TYPEN.length; j++) {
             TabTyp tab = new TabTyp(presenter, TYPEN[j]);
-            // brauch ich diese TabListe ??
-            // JA, da später auch weitere Tabs kommen könnten
-            // z.B. für Einstellungen
             tabListe.put(TYPEN[j], tab);
             tabFeld.getTabs().add(tab);
         }
@@ -141,6 +148,14 @@ public class View extends HBox {
         // wird nicht in die tabListe eingefügt, die ist nur für die Typen da
         TabWertung tabA = new TabWertung(presenter, "Auswertung");
         tabFeld.getTabs().add(tabA);
+
+        // Typenbearbeitungs aktualisieren
+        typXxMenue.getItems().clear();
+        for (int i = 0; i < typenXX.length; i++) {
+            MenuItem neuXx = new MenuItem("Xx " + typenXX[i]);
+            neuXx.setOnAction((e) -> presenter.typEntfernen(e));
+            typXxMenue.getItems().add(neuXx);
+        }
     }
 
     // letztes aktives Tab wieder setzen
@@ -148,14 +163,11 @@ public class View extends HBox {
         tabFeld.getSelectionModel().select(tabListe.get(initTyp));
     }
 
-    // letzten aktiven Helden setzen
-    void setHeld(String held) {
-        // Bild setzen
-        heldenBild.setImage(presenter.getImage(held));
-        // nur das richtige CheckItem anschalten
-        for (MenuItem a : heldenMenu.getItems()) {
-            CheckMenuItem b = (CheckMenuItem) a;
-            if (b.getText().equals(held)) { b.setSelected(true); }
+    // Held setzen
+    void setHeld(String held, Image image) {
+        heldenBild.setImage(image);
+        for (Toggle a : heldenToggle.getToggles()) {
+            if (((RadioMenuItem) a).getText().equals(held)) { heldenToggle.selectToggle(a); }
         }
     }
 
@@ -168,21 +180,10 @@ public class View extends HBox {
         return tabFeld.getSelectionModel().getSelectedItem();
     }
 
-    private void heldenWechsel(ActionEvent e, MenuButton heldenMenu, ImageView heldenBild) {
-        String aktHeld = ((MenuItem) e.getSource()).getText();
-        // Bild
-        heldenBild.setImage(presenter.getImage(aktHeld));
-        // andere CheckItem
-        CheckMenuItem s = (CheckMenuItem) e.getSource();
-        for (MenuItem a : heldenMenu.getItems()) {
-            CheckMenuItem b = (CheckMenuItem) a;
-            if (!b.equals(s)) { b.setSelected(false); }
-        }
-        // Presenter
-        if (true) {
-            // TODO Fallunterscheidung, wenn gerade die Einstellungsseite angezeigt wird...
-            presenter.heldenWechsel(aktHeld, aktTab());
-        }
+    private void heldenWechsel(Toggle newToggle) {
+        String aktHeld = ((RadioMenuItem) newToggle).getText();
+        heldenBild.setImage(presenter.getHeldImg(aktHeld));
+        presenter.heldenWechsel(aktHeld, aktTab());
     }
 
 }

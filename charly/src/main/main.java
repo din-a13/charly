@@ -1,9 +1,6 @@
 package main;
 
-import java.time.*;
-
 import javafx.application.*;
-import javafx.beans.binding.*;
 import javafx.stage.*;
 
 import gui.*;
@@ -29,9 +26,7 @@ public class main extends Application {
          */
 
         PresenterImport presenterImport = new PresenterImport();
-        while (prj == null) {
-            prj = presenterImport.getPrjStart();
-        }
+        prj = presenterImport.getPrjStart();
         /*
          * Wurzel initieren,
          * Einlesen der verschiedenen Grunddaten (durchWurzel)
@@ -83,47 +78,6 @@ public class main extends Application {
         // Projekt schreiben - hier ist letzter User und letzter typ gesetzt
         // TODO BEI TEAMPROJEKTEN MACHT DAS KEINEN SINN
         // DAS MUSS BEIM STANDART GESPEICHERT SEIN
-
-    }
-
-    /*
-     * Testmethoden
-     * __________________________________________________________________
-     */
-
-    private static void testBuchungenLesen(H0Wurzel w) {
-
-        Buchung b = new Buchung("Eva", "Lebensmittel", LocalDateTime.now(), 20.5, "jetzt - alles korrekt");
-        try {
-            w.add(b);
-        } catch (IllegalBuchungException e) {
-            e.printStackTrace();
-        }
-
-        NumberBinding wurzelSumBind = w.getWurzelSumme();
-        System.out.println(wurzelSumBind.getDependencies());
-        System.out.println(wurzelSumBind.getValue());
-        System.out.println(w.getHeldSumme("Daniel").getValue());
-        System.out.println(w.getTypSumme("Daniel", "Lebensmittel").getValue());
-
-        Buchung c = new Buchung("Eva", "Lebensmittel", LocalDateTime.now(), 20.5, "testfehler");
-        try {
-            w.add(c);
-        } catch (IllegalBuchungException e) {
-            e.printStackTrace();
-        }
-
-        wurzelSumBind = w.getWurzelSumme();
-        System.out.println(wurzelSumBind.getDependencies());
-        System.out.println(wurzelSumBind.getValue());
-        System.out.println(w.getHeldSumme("Eva").getValue());
-        System.out.println(w.getTypSumme("Eva", "Lebensmittel").getValue());
-
-        int i = 1;
-        for (Buchung e : w.getTypBuchungsListe("Eva", "Lebensmittel")) {
-            System.out.println(i++ + " " + e);
-
-        }
 
     }
 

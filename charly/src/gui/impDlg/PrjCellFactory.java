@@ -7,6 +7,13 @@ import model.inOut.*;
 
 public class PrjCellFactory implements Callback<ListView<Projekt>, ListCell<Projekt>> {
 
+    private PrjStringConverter converter;
+
+    public PrjCellFactory(PrjStringConverter converter) {
+        super();
+        this.converter = converter;
+    }
+
     @Override
     public ListCell<Projekt> call(ListView<Projekt> p) {
         return new ListCell<Projekt>() {
@@ -16,7 +23,7 @@ public class PrjCellFactory implements Callback<ListView<Projekt>, ListCell<Proj
                 if (item == null || empty) {
                     setGraphic(null);
                 } else {
-                    setText(item.name() + " (" + item.versionNr() + ")");
+                    setText(converter.toString(item));
                 }
             }
         };

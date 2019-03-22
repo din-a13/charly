@@ -3,8 +3,6 @@ package model.inOut;
 import java.io.*;
 import java.nio.file.*;
 
-import javafx.beans.property.*;
-
 public class Projekt implements Serializable {
 
     /**
@@ -115,16 +113,18 @@ public class Projekt implements Serializable {
         this.prjFolderPath = prjFolderPath;
     }
 
+    void setName(String name) {
+        this.projektName = name;
+        this.versionNr = 0;
+        this.buchIdx = 0;
+    }
+
     /*
      * Getter
      * __________________________________________________________________
      */
     public String name() {
         return projektName;
-    }
-
-    public SimpleStringProperty nameProperty() {
-        return new SimpleStringProperty(projektName);
     }
 
     public String[] HELDEN() {

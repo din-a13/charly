@@ -241,7 +241,7 @@ public class H0Wurzel {
     }
 
     /*
-     * Zugriff durch Presenter - singleSource of trouth
+     * Zugriff durch Presenter - singleSource of truth
      * __________________________________________________________________
      */
     public Projekt getPrj() {
@@ -267,6 +267,16 @@ public class H0Wurzel {
 
     public NumberBinding getTypSumme(String held, String typ) {
         return wurzelHeldenMap.get(held).getHeldTypenMap().get(typ).getTypSumme();
+    }
+
+    public String[] getHeldenXx() {
+        // TODO Auto-generated method stub
+        return prj.HELDEN();
+    }
+
+    public String[] getTypenXx() {
+        // TODO Auto-generated method stub
+        return prj.TYPEN();
     }
 
     /*

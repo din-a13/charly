@@ -1,10 +1,13 @@
 package gui;
 
+import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.time.*;
+import java.util.*;
 
 import javafx.collections.*;
+import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.chart.*;
 import javafx.scene.chart.XYChart.*;
@@ -47,10 +50,10 @@ public class Presenter {
 
     // initialisieren
     private void initView() {
-        view.setHelden(wurzel.getPrj().HELDEN());
-        view.setTypen(wurzel.getPrj().TYPEN());
+        view.setHelden(wurzel.getPrj().HELDEN(), wurzel.getHeldenXx());
+        view.setTypen(wurzel.getPrj().TYPEN(), wurzel.getTypenXx());
         view.setTyp(wurzel.getPrj().initTyp());
-        view.setHeld(aktHeld);
+        view.setHeld(aktHeld, getHeldImg(aktHeld));
         setTitle();
     }
 
@@ -73,6 +76,7 @@ public class Presenter {
             primaryStage.setTitle("Charly        ||Projekt:  " + wurzel.getPrj().name() + "  |Version: " + vrs + "  |Index: " + idx);
         }
     }
+
     /*
      * GETTER -- Ansprache durch TabTYP
      * __________________________________________________________________
@@ -230,7 +234,42 @@ public class Presenter {
     }
 
     void neuerHeld() {
-        // TODO
+        TextInputDialog heldNameDlg = new TextInputDialog();
+        heldNameDlg.setTitle("neuer Held");
+        heldNameDlg.setHeaderText("Gib einen Namen für deinen neuen Helden ein. (erlaubte Sonderzeichen: +-_()");
+        Optional<String> result = heldNameDlg.showAndWait();
+        result.ifPresent(eingabe -> {
+            String eingabeFlt = eingabe.replaceAll("[^\\wäüöÄÜÖ\\+\\-_\\(\\)]", "");
+            System.out.println(eingabeFlt);
+            // TODO
+        });
+    }
+
+    public Object heldEntfernen(ActionEvent e) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /*
+     * Änderung TYP -- Ansprache durch VIEW
+     * __________________________________________________________________
+     */
+
+    public void neuerTyp() {
+        TextInputDialog typNameDlg = new TextInputDialog();
+        typNameDlg.setTitle("neue Kategorie");
+        typNameDlg.setHeaderText("Gib eine Bezeichnung für die neue Ausgabenkategorie ein. (erlaubte Sonderzeichen: +-_()");
+        Optional<String> result = typNameDlg.showAndWait();
+        result.ifPresent(eingabe -> {
+            String eingabeFlt = eingabe.replaceAll("[^\\wäüöÄÜÖ\\+\\-_\\(\\)]", "");
+            // TODO
+            System.out.println(eingabeFlt);
+        });
+    }
+
+    public Object typEntfernen(ActionEvent e) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /*
@@ -240,16 +279,11 @@ public class Presenter {
      */
     // ImportButton / "Laden"
     public void Import() {
-        // TODO prüfen ob gut - Sicherheitshalber wird das aktuelle Projekt exportiert
-        Datei.buchExport(wurzel);
-
         PresenterImport presenterImport = new PresenterImport();
-        // aktuelles Projekt wird übergeben, damit es auch in der Liste angezeigt wird
-        // Rückgabe ist das neu gewählte Projekt
-        Projekt prj = presenterImport.getPrjImport(wurzel.getPrj());
+        Projekt prj = presenterImport.getPrjImport(wurzel);
 
-        // nur, wenn es eine Änderung gab!
-        if (presenterImport.prjHasChanged()) {
+        // wenn es keine Änderung gab, kommt null zurück - nichts passiert
+        if (prj != null) {
             // WURZEL neu aufbauen
             // MainMethoden nachahmen
             wurzel.initWurzel(prj);
@@ -266,34 +300,46 @@ public class Presenter {
         }
     }
 
-    // Export Button / "Speichern"
+    // ExportButton / "Speichern"
     public void buchungenSpeichern() {
         // Buchungen speichern, ohne increment
         Datei.buchExport(wurzel);
     }
 
-    // Export Button / "Speichern"
+    // ExportButton / "Speichern unter"
     public void prjExp() {
         // benötigt wird ein Verzeichniss zum Speichern
         DirectoryChooser dirChooser = new DirectoryChooser();
         Stage choose = new Stage();
-        Path dirPath = dirChooser.showDialog(choose).toPath();
-
-        if (dirPath != null) {
+        File dirFile = dirChooser.showDialog(choose);
+        if (dirFile != null) {
+            Path dirPath = dirFile.toPath();
             System.out.println("Ausgewähltes Verzeichniss: " + dirPath);
             // Buchungen und Projekt speichern (dabei ohne increment)
             Datei.buchExport(wurzel, dirPath);
         }
     }
 
-    // Auffinden der HeldenIcon
-    Image getImage(String held) {
+    void prjNameAndern() {
+        TextInputDialog prjNameDlg = new TextInputDialog(wurzel.getPrj().name());
+        prjNameDlg.setTitle("Projektname ändern");
+        prjNameDlg.setHeaderText("Gib einen neuen Projektnamen ein. (erlaubte Sonderzeichen: +-_()");
+        Optional<String> result = prjNameDlg.showAndWait();
+        result.ifPresent(eingabe -> {
+            String eingabeFlt = eingabe.replaceAll("[^\\wäüöÄÜÖ\\+\\-_\\(\\)]", "");
+            Datei.changePrjName(wurzel, eingabeFlt);
+        });
+        setTitle();
+    }
+
+    // Aufruf durch View und init-Methode im Presenter
+    Image getHeldImg(String held) {
+        // Auffinden der HeldenIcon
         // Verweis auf Standart im View-ordner
         String url = "/gui/" + held + ".bmp";
         // Nur wenn im Projektordener wirklich was drinn ist, wird der Standartverweis überschrieben
         Path prjFolderPath = wurzel.getPrj().getPrjFolderPath();
         Path imgPath = Paths.get(prjFolderPath.toString() + "\\" + held + ".bmp");
-
         try {
             url = imgPath.toUri().toURL().toString();
         } catch (MalformedURLException e) {
@@ -310,4 +356,5 @@ public class Presenter {
      *
      */
 
+    // TODO wenn das aktuelle Projekt mal als Standart gesetzt war, könnte der Standart auf den Index erhöht werden
 }
