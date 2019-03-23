@@ -7,7 +7,7 @@ import javafx.beans.binding.*;
 import javafx.beans.property.*;
 import javafx.collections.*;
 
-import model.inOut.*;
+import inOut.*;
 
 // der oberste Knoten des Modells über ihn läuft der gesamte Buchungsprozess
 public class H0Wurzel {
@@ -253,6 +253,12 @@ public class H0Wurzel {
      * __________________________________________________________________
      */
 
+    // für TabTyp
+    public ObservableList<Buchung> getTypBuchungsListe() {
+        return getTypBuchungsListe(prj.initHeld(), prj.initTyp());
+    }
+
+    // für Auswertung
     public ObservableList<Buchung> getTypBuchungsListe(String held, String typ) {
         return FXCollections.observableArrayList(wurzelHeldenMap.get(held).getHeldTypenMap().get(typ).getTypenBuchungsMap().values());
     }

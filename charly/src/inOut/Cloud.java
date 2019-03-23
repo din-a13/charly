@@ -1,4 +1,4 @@
-package model.inOut;
+package inOut;
 
 public class Cloud
 {

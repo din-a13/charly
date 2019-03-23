@@ -5,7 +5,7 @@ import java.util.regex.*;
 import javafx.scene.control.*;
 import javafx.util.*;
 
-import model.inOut.*;
+import inOut.*;
 
 public class PrjStringConverter extends StringConverter<Projekt> {
     private ComboBox<Projekt> auswahl;

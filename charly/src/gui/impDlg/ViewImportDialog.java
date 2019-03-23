@@ -9,7 +9,7 @@ import javafx.scene.text.*;
 import javafx.stage.*;
 
 import gui.*;
-import model.inOut.*;
+import inOut.*;
 
 public class ViewImportDialog extends Stage {
 

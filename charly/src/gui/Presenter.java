@@ -16,8 +16,8 @@ import javafx.scene.image.*;
 import javafx.stage.*;
 
 import gui.impDlg.*;
+import inOut.*;
 import model.*;
-import model.inOut.*;
 
 public class Presenter {
 
@@ -33,12 +33,10 @@ public class Presenter {
     private Stage primaryStage;
     private View view;
     private H0Wurzel wurzel;
-    // Projektinstanz über die Wurzel ziehen -> singel source of throuth
-    String aktHeld;
+    // Projektinstanz & aktHeld über die Wurzel ziehen -> singel source of throuth
 
     public Presenter(H0Wurzel w) {
         this.wurzel = w;
-        this.aktHeld = w.getPrj().initHeld();
         this.view = new View(this);
         initView();
     }
@@ -50,9 +48,11 @@ public class Presenter {
 
     // initialisieren
     private void initView() {
+        String aktHeld = wurzel.getPrj().initHeld();
+        String aktTyp = wurzel.getPrj().initTyp();
         view.setHelden(wurzel.getPrj().HELDEN(), wurzel.getHeldenXx());
         view.setTypen(wurzel.getPrj().TYPEN(), wurzel.getTypenXx());
-        view.setTyp(wurzel.getPrj().initTyp());
+        view.setTyp(aktTyp);
         view.setHeld(aktHeld, getHeldImg(aktHeld));
         setTitle();
     }
@@ -96,8 +96,8 @@ public class Presenter {
      */
 
     public void tabellenAnsichtNeu(TabTyp aktTab) {
-        String aktTyp = aktTab.getText();
-        ObservableList<Buchung> ganzeListe = wurzel.getTypBuchungsListe(aktHeld, aktTyp);
+        wurzel.getPrj().setinitTyp(aktTab.getText());
+        ObservableList<Buchung> ganzeListe = wurzel.getTypBuchungsListe();
         ObservableList<Buchung> filterListe = FXCollections.observableArrayList();
         // übernehme keine leeren SummenBuchungen
         for (Buchung b : ganzeListe) {
@@ -164,7 +164,7 @@ public class Presenter {
     public boolean addBuchung(TabTyp aktTab, String betragString, String hinweis, LocalDate datum) {
         String aktTyp = aktTab.getText();
         try {
-            wurzel.add(new Buchung(aktHeld, aktTyp, LocalDateTime.of(datum, LocalTime.now()), parseDoubleBetrag(betragString), hinweis));
+            wurzel.add(new Buchung(wurzel.getPrj().initHeld(), aktTyp, LocalDateTime.of(datum, LocalTime.now()), parseDoubleBetrag(betragString), hinweis));
 
         } catch (Exception e) {
             System.out.println(e);
@@ -226,7 +226,7 @@ public class Presenter {
      */
 
     void heldenWechsel(String aktHeld, Tab aktTab) {
-        this.aktHeld = aktHeld;
+        wurzel.getPrj().setinitHeld(aktHeld);
         if (aktTab.getClass().toString().equals("class gui.TabTyp")) {
             String aktTyp = aktTab.getText();
             tabellenAnsichtNeu((TabTyp) aktTab);

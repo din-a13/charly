@@ -5,8 +5,8 @@ import javafx.stage.*;
 
 import gui.*;
 import gui.impDlg.*;
+import inOut.*;
 import model.*;
-import model.inOut.*;
 
 public class main extends Application {
 
@@ -56,29 +56,10 @@ public class main extends Application {
 
     @Override
     public void stop() {
-        /*
-         * ?? -> Button überwachen, und fragen, ob gerade eine Datenbankaktion (Wurzel-methode oder IO Aktion) läuft,
-         * dann
-         * warten
-         * - Stop Methode überschreiben:
-         * - Letzten User setzen in Projektobjekt
-         * - Projektclasse als datei überschreiben
-         */
-
-        // TODO Letzten User setzen in Projektobjekt
-        // durch Presenter ?
-        // TODO Projektclasse als datei überschreiben
-        // durch Presenter
-        // TODO Standartprojektdateipfad neu setzen
-
         // Buchungen automatisch schreiben - kein Datenverlust
         // dabei wird auch das Projekt geschrieben, damit BuchIdx richtig abgelegt ist
         Datei.buchExport(wurzel);
-
-        // Projekt schreiben - hier ist letzter User und letzter typ gesetzt
-        // TODO BEI TEAMPROJEKTEN MACHT DAS KEINEN SINN
-        // DAS MUSS BEIM STANDART GESPEICHERT SEIN
-
+        Datei.stdPrjDateiSchreiben(wurzel.getPrj());
     }
 
 }

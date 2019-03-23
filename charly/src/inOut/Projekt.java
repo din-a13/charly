@@ -1,4 +1,4 @@
-package model.inOut;
+package inOut;
 
 import java.io.*;
 import java.nio.file.*;
@@ -22,10 +22,9 @@ public class Projekt implements Serializable {
     private int[] JAHRE = { 0, 0 };
 
     // SITZUNG
-    // TODO BEI TEAMPROJEKTEN MACHT DAS KEINEN SINN
-    // DAS MUSS BEIM STANDART GESPEICHERT SEIN
-    private String initHeld;
-    private String initTyp;
+    // Beim lesen aus starddatei wird das gesetzt
+    private transient String initHeld;
+    private transient String initTyp;
 
     // LAUFZEIT
     // Attribut nur für die Laufzeit - darf nicht serialisiert werden, sonnst Fehler
@@ -117,6 +116,23 @@ public class Projekt implements Serializable {
         this.projektName = name;
         this.versionNr = 0;
         this.buchIdx = 0;
+    }
+
+    /*
+     * Setter - auch für den Presenter
+     * __________________________________________________________________
+     */
+
+    // wird nicht serealisiert
+    // wenn nicht explizit gesetzt, dann Feld[0]
+    public void setinitHeld(String initHeld) {
+        this.initHeld = initHeld;
+    }
+
+    // wird nicht serealisiert
+    // wenn nicht explizit gesetzt, dann Feld[0]
+    public void setinitTyp(String initTyp) {
+        this.initTyp = initTyp;
     }
 
     /*

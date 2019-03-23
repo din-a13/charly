@@ -3,7 +3,7 @@ package gui.impDlg;
 import javafx.scene.control.*;
 import javafx.util.*;
 
-import model.inOut.*;
+import inOut.*;
 
 public class PrjCellFactory implements Callback<ListView<Projekt>, ListCell<Projekt>> {
 

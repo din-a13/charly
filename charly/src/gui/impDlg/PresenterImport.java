@@ -5,8 +5,8 @@ import java.nio.file.*;
 
 import javafx.stage.*;
 
+import inOut.*;
 import model.*;
-import model.inOut.*;
 
 public class PresenterImport {
 
@@ -17,10 +17,9 @@ public class PresenterImport {
 
     private ViewImportDialog viewImportDialog;
     private Projekt prj;
-    boolean prjHasChanged;
 
     public PresenterImport() {
-        prjHasChanged = false;
+        // leer
     }
 
     /*
@@ -31,16 +30,11 @@ public class PresenterImport {
     // Aufruf durch MAIN
     public Projekt getPrjStart() {
         prj = null;
-        // Standartdatei für Projektauswahl suchen
-        // gibt null zurück, wenn die Standartdatei nicht auffindbar ist
-        // Wenn diese auffindbar ist, wird gelesen
-        Path path = Datei.stdPrjPath();
-        if (path != null) {
-            prj = Datei.readProjekt(path);
-            if (prj != null) { return prj; }
-        }
+
+        prj = Datei.stdPrj();
+        if (prj != null) { return prj; }
+
         // Wenn die Standartdatei nicht gefunden / gelesen werden konnte:
-        // oder das in der Stadartdaei enthalten prj nicht gelesen werden konnte,
         // geht es Richtung Dialog weiter -> wenn keine Projektobjekte da sind
         // eine leere Liste an Auswahldialog übergeben
         viewImportDialog = new ViewImportDialog();
@@ -83,11 +77,8 @@ public class PresenterImport {
     void returnEnd(Projekt prj, boolean selected) {
         // Bevor das DialogFenster aus showAndWait zurück kehrt, wird hier im Presenter das Projekt gesetzt
         // Test, ob sich was überhaupt was geädert hat
-        if (this.prj != prj && prj != null) {
-            this.prj = prj;
-            this.prjHasChanged = true;
-        }
-        // Standart setzen
+        if (this.prj != prj && prj != null) { this.prj = prj; }
+        // Standart setzen (mit prj, da dieses noch nicht in der Wurzel ist)
         if (selected && prj != null) { Datei.stdPrjDateiSchreiben(prj); }
         // jetzt DialogStage schließen
         viewImportDialog.close();

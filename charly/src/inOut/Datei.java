@@ -1,4 +1,4 @@
-package model.inOut;
+package inOut;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -217,6 +217,8 @@ public class Datei {
         return absPfad;
     }
 
+    // direkter Aufruf nur durch PresenterImport, nach Import
+    // gezogen werden dann Standart-Werte
     public static void stdPrjDateiSchreiben(Projekt prj) {
         // Dir muss existieren
         try {
@@ -224,27 +226,48 @@ public class Datei {
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
         }
-
-        // Schreibt den Dateipfad und den Projektnamen
-        String s;
+        // Schreibt Sitzungsdaten, und den Projektnamen
+        String[] std = { "", "", "", "" };
+        std[0] = prj.name();
+        std[1] = prj.initHeld();
+        std[2] = prj.initTyp();
+        std[3] = prjDateiPfad(prj).toString();
         try (BufferedWriter writer = Files.newBufferedWriter(stdPrjDateiPfad(), charset)) {
-            s = prj.name();
-            writer.write(s, 0, s.length());
+            writer.write(std[0], 0, std[1].length());
             writer.newLine();
-            s = prjDateiPfad(prj).toString();
-            writer.write(s, 0, s.length());
+            writer.write(std[1], 0, std[1].length());
+            writer.newLine();
+            writer.write(std[2], 0, std[2].length());
+            writer.newLine();
+            writer.write(std[3], 0, std[3].length());
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
     }
 
-    public static Path stdPrjPath() {
-        Path pfad = null;
+    public static Projekt stdPrj() {
+        // Standartdatei für Projektauswahl suchen
+        // gibt null zurück, wenn die Standartdatei nicht auffindbar ist,
+        // oder das in der Stadartdaei enthalten prj nicht gelesen werden konnte
+        // Wenn diese auffindbar ist, wird gelesen
+        Projekt prj = null;
         try (BufferedReader reader = Files.newBufferedReader(stdPrjDateiPfad(), charset)) {
-            String name = reader.readLine();
-            String sp = reader.readLine();
-            pfad = Paths.get(sp);
-            System.out.println("IO/standart.txt: " + name + " : " + sp);
+            String[] std = { "", "", "", "" };
+            std[0] = reader.readLine();
+            std[1] = reader.readLine();
+            std[2] = reader.readLine();
+            std[3] = reader.readLine();
+            Path pfad = null;
+            pfad = Paths.get(std[3]);
+            System.out.println("IO/standart.txt: " + std[0] + " : " + std[1] + " : " + std[2] + " : " + std[3]);
+            if (pfad != null) {
+                prj = Datei.readProjekt(pfad);
+                if (prj != null) {
+                    prj.setinitHeld(std[1]);
+                    prj.setinitTyp(std[2]);
+                    return prj;
+                }
+            }
         } catch (NoSuchFileException nf) {
             System.err.format("IOException: %s%n" + " : kein Standart eingetragen", nf);
         } catch (IOException x) {
@@ -252,7 +275,7 @@ public class Datei {
         } catch (Exception y) {
             System.err.format("Fehler bei Auswertung der standart.txt: %s%n", y);
         }
-        return pfad;
+        return prj;
     }
 
     // Standart ProjektOrdner
