@@ -23,8 +23,8 @@ public class Projekt implements Serializable {
 
     // SITZUNG
     // Beim lesen aus starddatei wird das gesetzt
-    private transient String initHeld;
-    private transient String initTyp;
+    private transient String aktHeld;
+    private transient String aktTyp;
 
     // LAUFZEIT
     // Attribut nur für die Laufzeit - darf nicht serialisiert werden, sonnst Fehler
@@ -125,14 +125,14 @@ public class Projekt implements Serializable {
 
     // wird nicht serealisiert
     // wenn nicht explizit gesetzt, dann Feld[0]
-    public void setinitHeld(String initHeld) {
-        this.initHeld = initHeld;
+    public void setAktHeld(String aktHeld) {
+        this.aktHeld = aktHeld;
     }
 
     // wird nicht serealisiert
     // wenn nicht explizit gesetzt, dann Feld[0]
-    public void setinitTyp(String initTyp) {
-        this.initTyp = initTyp;
+    public void setAktTyp(String aktTyp) {
+        this.aktTyp = aktTyp;
     }
 
     /*
@@ -155,14 +155,14 @@ public class Projekt implements Serializable {
         return JAHRE;
     }
 
-    public String initHeld() {
-        if (initHeld == null) { initHeld = HELDEN[0]; }
-        return initHeld;
+    public String aktHeld() {
+        if (aktHeld == null) { aktHeld = HELDEN[0]; }
+        return aktHeld;
     }
 
-    public String initTyp() {
-        if (initTyp == null) { initTyp = TYPEN[0]; }
-        return initTyp;
+    public String aktTyp() {
+        if (aktTyp == null) { aktTyp = TYPEN[0]; }
+        return aktTyp;
     }
 
     public int versionNr() {

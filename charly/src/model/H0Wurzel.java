@@ -53,6 +53,8 @@ public class H0Wurzel {
      * SUMMEN - Lösung mit SimpleDoubleProperty
      * an diese werden die DoubleProperties der Buchungen gebunden
      *
+     * TODO Die ersten 3 Gesamtsummen werden NUR ZUR KONTROLLE DES MODELL
+     *
      * // wurzelSumme 1 ____________________________________________ Binding
      * // // heldSumme 1...n Wurzel ________________________________ Binding
      * // // // typSumme 1...nWurzel _______________________________ Binding
@@ -66,7 +68,9 @@ public class H0Wurzel {
      * // Monatsbuchung __yyyy_mm_01_0__0__2
      *
      * // Map<String,Held> ____________________wurzelHeldenMap______Object Attribut
+     * // Map<LocalDateTime,NumberBinding> ____wurzelKumulDifMap____Object Attribut
      * // // Map<String,Typ> __________________heldTypenMap_________Object Attribut
+     * // // Map<LocalDateTime,NumberBinding> _heldKumulSumMap______Object Attribut
      * // // // Map<LocalDateTime,Buchung> ____typBuchungsMap_______Object Attribut
      *
      * Klassenbeziehung - an Properties kann leider kein USERDATA gebunden werden
@@ -78,16 +82,21 @@ public class H0Wurzel {
      */
 
     private NumberBinding wurzelSumBind;
+    private ObservableMap<LocalDateTime, NumberBinding> wurzelKumulSumMap;
     private ObservableMap<String, H1Held> wurzelHeldenMap;
 
     public void initModel() {
         // WURZEL
-        wurzelSumBind = new SimpleDoubleProperty(0).add(0);
+        wurzelSumBind = new SimpleDoubleProperty(0).add(0); // Verknüpfungen werden erst beim Einfügen gebildet ???
+        wurzelKumulSumMap = FXCollections.observableMap(new TreeMap<LocalDateTime, NumberBinding>());
         wurzelHeldenMap = FXCollections.observableMap(new TreeMap<String, H1Held>());
         for (String h : prj.HELDEN()) {
+            // HELDEN - SUM-Zwischenspeicher nur temporär benötigt
+            ObservableMap<LocalDateTime, NumberBinding> heldKumulSumMap = FXCollections.observableMap(new TreeMap<LocalDateTime, NumberBinding>()); // temporär
             // HELDEN
+            ObservableMap<LocalDateTime, NumberBinding> heldKumulDifMap = FXCollections.observableMap(new TreeMap<LocalDateTime, NumberBinding>());
             ObservableMap<String, H2Typ> heldTypenMap = FXCollections.observableMap(new TreeMap<String, H2Typ>());
-            H1Held held = new H1Held(heldTypenMap);
+            H1Held held = new H1Held(heldTypenMap, heldKumulDifMap);
             for (String t : prj.TYPEN()) {
                 // TYPEN
                 ObservableMap<LocalDateTime, Buchung> typenBuchungsMap = FXCollections.observableMap(new TreeMap<LocalDateTime, Buchung>());
@@ -101,6 +110,29 @@ public class H0Wurzel {
                         //
                         // Monatssummen in Typen stecken
                         typenBuchungsMap.put(monatBuchung.getDate(), monatBuchung);
+                        //
+                        // Monatssummen Kumulierte Summen aufbauen - nur bei Monatsbuchungen
+                        LocalDateTime date = monatBuchung.getDate();
+                        // An Vormonat binden, wenn nicht ganz am Anfang
+                        if (!(y == prj.JAHRE()[0] & m == 1)) {
+                            NumberBinding vorMonBindVorgKumSum = ((SummenBuchung) typenBuchungsMap.get(date.minusMonths(1))).getBindVorgKumSum();
+                            NumberBinding monBindVorgKumSumNEU = monatBuchung.getBindVorgKumSum().add(vorMonBindVorgKumSum);
+                            monatBuchung.setBindVorgKumSum(monBindVorgKumSumNEU);
+                        }
+                        // beim ersten mal erst ein neues Binding erzeugen (Null)
+                        if (heldKumulSumMap.get(date) == null) {
+                            heldKumulSumMap.put(date, monatBuchung.getBindVorgKumSum());
+                        } else {
+                            heldKumulSumMap.put(date, heldKumulSumMap.get(date).add(monatBuchung.getBindVorgKumSum()));
+                        }
+                        if (wurzelKumulSumMap.get(date) == null) {
+                            wurzelKumulSumMap.put(date, monatBuchung.getBindVorgKumSum());
+                        } else {
+                            wurzelKumulSumMap.put(date, wurzelKumulSumMap.get(date).add(heldKumulSumMap.get(date)));
+                        }
+                        // TODO HIER MUSS IRGENDWIE EIN DURCHSCHNITT ERRECHNET WERDEN
+                        // Monatssummen Differenzsumme immer wieder überschreiben aufbauen
+                        heldKumulDifMap.put(date, wurzelKumulSumMap.get(date).divide(prj.HELDEN().length).subtract(heldKumulSumMap.get(date)));
                     }
                     // Jahressummen in Typen stecken
                     typenBuchungsMap.put(jahrBuchung.getDate(), jahrBuchung);
@@ -117,6 +149,7 @@ public class H0Wurzel {
      * Buchung prüfen
      * __________________________________________________________________
      */
+
     /*
      * Prüfung ob die Buchung zu dieser Wurzel passt (den Arrays entspricht)
      * Wenn nicht, wird ein Fehler geworfen und die Buchung nicht weiter verarbeitet *
@@ -170,15 +203,18 @@ public class H0Wurzel {
         }
         t.getTypenBuchungsMap().put(b.getDate(), b);
 
-        // Wurzelsumme // Heldsumme // Typsumme
+        // TODO NUR ZUR KONTROLLE DES MODELL BENUTZT Wurzelsumme // Heldsumme // Typsumme
         wurzelSumBind = wurzelSumBind.add(b.getBetrag());
         h.setHeldSumme(h.getHeldSumme().add(b.getBetrag()));
         t.setTypSumme(t.getTypSumme().add(b.getBetrag()));
+
+        // Wegen Wertübergabe, muss hier BIS JETZT jeder Betrag separat an die Summen gebunden werden
 
         // Jahressumme anpassen
         LocalDateTime y = SummenBuchung.getJahrSumZeit(b);
         SummenBuchung yS = (SummenBuchung) t.getTypenBuchungsMap().get(y);
         yS.setBuchungSumme(yS.getBuchungSumme().add(b.getBetrag()));
+
         // Monatssumme anpassen
         LocalDateTime m = SummenBuchung.getMonatSumZeit(b);
         SummenBuchung mS = (SummenBuchung) t.getTypenBuchungsMap().get(m);
@@ -253,26 +289,19 @@ public class H0Wurzel {
      * __________________________________________________________________
      */
 
-    // für TabTyp
+    // Presenter für für TabTyp-Daten
     public ObservableList<Buchung> getTypBuchungsListe() {
-        return getTypBuchungsListe(prj.initHeld(), prj.initTyp());
+        return getTypBuchungsListe(prj.aktHeld(), prj.aktTyp());
     }
 
-    // für Auswertung
+    // Presenter für Auswertungsdaten
     public ObservableList<Buchung> getTypBuchungsListe(String held, String typ) {
         return FXCollections.observableArrayList(wurzelHeldenMap.get(held).getHeldTypenMap().get(typ).getTypenBuchungsMap().values());
     }
 
-    public NumberBinding getWurzelSumme() {
-        return wurzelSumBind;
-    }
-
-    public NumberBinding getHeldSumme(String held) {
-        return wurzelHeldenMap.get(held).getHeldSumme();
-    }
-
-    public NumberBinding getTypSumme(String held, String typ) {
-        return wurzelHeldenMap.get(held).getHeldTypenMap().get(typ).getTypSumme();
+    // Presenter für Differenzansicht
+    public ObservableList<NumberBinding> getKumulDifListe(String held) {
+        return FXCollections.observableArrayList(wurzelHeldenMap.get(held).getHeldKumulDifMap().values());
     }
 
     public String[] getHeldenXx() {
@@ -289,6 +318,7 @@ public class H0Wurzel {
      * I / O
      * __________________________________________________________________
      */
+
     public List<Buchung> getBuchungsListe() {
         List<Buchung> liste = new ArrayList<>();
         for (H1Held held : wurzelHeldenMap.values()) {
@@ -300,5 +330,23 @@ public class H0Wurzel {
         }
         return liste;
     }
+
+    /*
+     * TODO nicht genutzte getter
+     * __________________________________________________________________
+     *
+     *
+     * private NumberBinding getWurzelSumme() {
+     * return wurzelSumBind;
+     * }
+     *
+     * private NumberBinding getHeldSumme(String held) {
+     * return wurzelHeldenMap.get(held).getHeldSumme();
+     * }
+     *
+     * private NumberBinding getTypSumme(String held, String typ) {
+     * return wurzelHeldenMap.get(held).getHeldTypenMap().get(typ).getTypSumme();
+     * }
+     */
 
 }

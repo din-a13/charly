@@ -48,8 +48,8 @@ public class Presenter {
 
     // initialisieren
     private void initView() {
-        String aktHeld = wurzel.getPrj().initHeld();
-        String aktTyp = wurzel.getPrj().initTyp();
+        String aktHeld = wurzel.getPrj().aktHeld();
+        String aktTyp = wurzel.getPrj().aktTyp();
         view.setHelden(wurzel.getPrj().HELDEN(), wurzel.getHeldenXx());
         view.setTypen(wurzel.getPrj().TYPEN(), wurzel.getTypenXx());
         view.setTyp(aktTyp);
@@ -91,12 +91,12 @@ public class Presenter {
     }
 
     /*
-     * Aktualisieren -- Ansprache durch TabTYP, TabWertung, Presenter
+     * Aktualisieren -- Ansprache durch TabTYP, Presenter
      * __________________________________________________________________
      */
 
     public void tabellenAnsichtNeu(TabTyp aktTab) {
-        wurzel.getPrj().setinitTyp(aktTab.getText());
+        wurzel.getPrj().setAktTyp(aktTab.getText());
         ObservableList<Buchung> ganzeListe = wurzel.getTypBuchungsListe();
         ObservableList<Buchung> filterListe = FXCollections.observableArrayList();
         // übernehme keine leeren SummenBuchungen
@@ -108,22 +108,29 @@ public class Presenter {
         aktTab.aktAnsicht(filterListe);
     }
 
+    /*
+     * Aktualisieren -- Ansprache durch TabWertung
+     * __________________________________________________________________
+     */
+
     public void AuswertungAnsichtNeu(TabWertung source) {
-        // Werte aus der Wurzel ziehen:
+        // MonatSummenWerte aus der Wurzel ziehen:
+        // in ein DatenItem schreiben und
         // Je TYP und HELD in eine neue Series einfügen:
         // Parallel max & min ermitteln
 
         ObservableList<XYChart.Series<String, Number>> seriesListe = FXCollections.observableArrayList();
-        double max = 0;
-        double min = 0;
+        Double max = 0.0;
+        Double min = 0.0;
 
         for (int t = 0; t < wurzel.getPrj().TYPEN().length; t++) {
-            // Typen
             String typ = wurzel.getPrj().TYPEN()[t];
             for (int h = 0; h < wurzel.getPrj().HELDEN().length; h++) {
-                // Helden
+
                 String held = wurzel.getPrj().HELDEN()[h];
-                // Datenliste
+
+                // TODO ??? AB HIER ZUR WURZEL SCHIEBEN -->
+                // Datenliste von Wurzel holen
                 ObservableList<XYChart.Data<String, Number>> datenListe = FXCollections.observableArrayList();
                 // Buchungen holen und DatenPunkt <String,Number> umwandeln
                 ObservableList<Buchung> buchList = wurzel.getTypBuchungsListe(held, typ);
@@ -142,6 +149,8 @@ public class Presenter {
                         if (d < 0 && d < min) { min = d; }
                     }
                 }
+                // TODO <-- BIS HIER ZUR WURZEL SCHIEBEN ???
+
                 // neue Series mit Name und Daten erzeugen und hinzufügen
                 XYChart.Series<String, Number> series = new Series<>(typ + ", " + held, datenListe);
                 seriesListe.add(series);
@@ -158,13 +167,23 @@ public class Presenter {
     }
 
     /*
+     * Aktualisieren -- Ansprache durch TabAusgleich
+     * __________________________________________________________________
+     */
+
+    public void DifferenzAnsichtNeu(TabDifferenz source) {
+
+    }
+
+    /*
      * Buchungen -- Ansprache durch TabTYP
      * __________________________________________________________________
      */
+
     public boolean addBuchung(TabTyp aktTab, String betragString, String hinweis, LocalDate datum) {
         String aktTyp = aktTab.getText();
         try {
-            wurzel.add(new Buchung(wurzel.getPrj().initHeld(), aktTyp, LocalDateTime.of(datum, LocalTime.now()), parseDoubleBetrag(betragString), hinweis));
+            wurzel.add(new Buchung(wurzel.getPrj().aktHeld(), aktTyp, LocalDateTime.of(datum, LocalTime.now()), parseDoubleBetrag(betragString), hinweis));
 
         } catch (Exception e) {
             System.out.println(e);
@@ -226,7 +245,7 @@ public class Presenter {
      */
 
     void heldenWechsel(String aktHeld, Tab aktTab) {
-        wurzel.getPrj().setinitHeld(aktHeld);
+        wurzel.getPrj().setAktHeld(aktHeld);
         if (aktTab.getClass().toString().equals("class gui.TabTyp")) {
             String aktTyp = aktTab.getText();
             tabellenAnsichtNeu((TabTyp) aktTab);

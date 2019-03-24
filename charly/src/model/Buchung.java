@@ -11,7 +11,7 @@ public class Buchung {
     private SimpleStringProperty held;
     private SimpleStringProperty typ;
     private LocalDateTime date;
-    private SimpleDoubleProperty betrag;
+    protected SimpleDoubleProperty betrag;
     private SimpleStringProperty hinweis;
 
     // _____________________________________________________________

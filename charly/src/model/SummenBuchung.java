@@ -7,12 +7,38 @@ import javafx.beans.property.*;
 
 public class SummenBuchung extends Buchung {
 
+    /*
+     * <monatSumme1>.............<MonatSumme2>
+     * kumSum1...................kumSum2
+     * ...^.........................^...
+     * ...|.........................|...
+     * bindVorgKumSum1<----------bindVorgKumSum2
+     *
+     * kumSum ist Statisch - kein Binding!
+     * wird mit buchungSumme immer aktualisert
+     * sonnst funktioniert Binding mit Helden / Wurzel nicht
+     * (die brauchen einen Property - als Variable)
+     *
+     */
+    private NumberBinding bindVorgKumSum;
+    private SimpleDoubleProperty kumSum;
+
+    /*
+     * buchungSumme
+     * <----SimplDoubleProperty buchBetrag1
+     * <----SimplDoubleProperty buchBetrag2
+     * <----SimplDoubleProperty buchBetrag3
+     * ....
+     */
+
     private NumberBinding buchungSumme;
 
     public SummenBuchung(String h, String t, LocalDateTime dateSum, Number betrag, String hinweis) {
         super(h, t, dateSum, betrag, hinweis);
         this.setDateSum(dateSum);
         buchungSumme = new SimpleDoubleProperty(0).add(0);
+        kumSum = new SimpleDoubleProperty(0);
+        bindVorgKumSum = new SimpleDoubleProperty(0).add(kumSum);
     }
 
     // _____________________________________________________________
@@ -56,6 +82,17 @@ public class SummenBuchung extends Buchung {
 
     void setBuchungSumme(NumberBinding buchungSumme) {
         this.buchungSumme = buchungSumme;
+        kumSum.set((Double) buchungSumme.getValue());
+    }
+
+    void setBindVorgKumSum(NumberBinding bindVorgKumSum) {
+        this.bindVorgKumSum = bindVorgKumSum;
+    }
+
+    // TODO vielleicht brauch ich dass nicht,
+    // wenn ich jedesmal die Summe eintrage (oben)
+    void addToKumSum(Double d) {
+        kumSum.set(kumSum.get() + d);
     }
 
     // _____________________________________________________________
@@ -67,7 +104,15 @@ public class SummenBuchung extends Buchung {
         return buchungSumme;
     }
 
+    public NumberBinding getBindVorgKumSum() {
+        return bindVorgKumSum;
+    }
+
     @Override
+    /*
+     * gibt ein Binding zu allen Observable Values des jeweiligen Zeitraumes zurück
+     * so wie Sie im Modell in der ADDBUCHUNG()Methode angelegt werden
+     */
     public SimpleDoubleProperty getBetrag() {
         SimpleDoubleProperty toBind = new SimpleDoubleProperty();
         toBind.bind(buchungSumme);

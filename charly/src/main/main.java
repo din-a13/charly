@@ -1,6 +1,8 @@
 package main;
 
 import javafx.application.*;
+import javafx.beans.binding.*;
+import javafx.beans.property.*;
 import javafx.stage.*;
 
 import gui.*;
@@ -43,6 +45,13 @@ public class main extends Application {
          */
 
         Datei.buchImport(wurzel);
+
+        // Testmethode
+        for (NumberBinding n : wurzel.getKumulDifListe(prj.aktHeld())) {
+            System.out.print(n.toString());
+            SimpleDoubleProperty neu = new SimpleDoubleProperty(n.doubleValue());
+            System.out.println(" : " + neu.getValue());
+        }
 
         /*
          * Presenter initieren

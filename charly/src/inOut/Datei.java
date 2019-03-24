@@ -229,8 +229,8 @@ public class Datei {
         // Schreibt Sitzungsdaten, und den Projektnamen
         String[] std = { "", "", "", "" };
         std[0] = prj.name();
-        std[1] = prj.initHeld();
-        std[2] = prj.initTyp();
+        std[1] = prj.aktHeld();
+        std[2] = prj.aktTyp();
         std[3] = prjDateiPfad(prj).toString();
         try (BufferedWriter writer = Files.newBufferedWriter(stdPrjDateiPfad(), charset)) {
             writer.write(std[0], 0, std[1].length());
@@ -263,8 +263,8 @@ public class Datei {
             if (pfad != null) {
                 prj = Datei.readProjekt(pfad);
                 if (prj != null) {
-                    prj.setinitHeld(std[1]);
-                    prj.setinitTyp(std[2]);
+                    prj.setAktHeld(std[1]);
+                    prj.setAktTyp(std[2]);
                     return prj;
                 }
             }
