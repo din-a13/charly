@@ -6,7 +6,7 @@ import javafx.util.*;
 
 import model.*;
 
-public class EditTextFieldTableCell<S, T> extends TextFieldTableCell<S, T> {
+class EditTextFieldTableCell<S, T> extends TextFieldTableCell<S, T> {
 
     /***************************************************************************
      * *

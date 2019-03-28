@@ -5,7 +5,9 @@ import java.net.*;
 import java.nio.file.*;
 import java.time.*;
 import java.util.*;
+import java.util.regex.*;
 
+import javafx.beans.binding.*;
 import javafx.collections.*;
 import javafx.event.*;
 import javafx.scene.*;
@@ -126,10 +128,8 @@ public class Presenter {
         for (int t = 0; t < wurzel.getPrj().TYPEN().length; t++) {
             String typ = wurzel.getPrj().TYPEN()[t];
             for (int h = 0; h < wurzel.getPrj().HELDEN().length; h++) {
-
                 String held = wurzel.getPrj().HELDEN()[h];
 
-                // TODO ??? AB HIER ZUR WURZEL SCHIEBEN -->
                 // Datenliste von Wurzel holen
                 ObservableList<XYChart.Data<String, Number>> datenListe = FXCollections.observableArrayList();
                 // Buchungen holen und DatenPunkt <String,Number> umwandeln
@@ -149,7 +149,6 @@ public class Presenter {
                         if (d < 0 && d < min) { min = d; }
                     }
                 }
-                // TODO <-- BIS HIER ZUR WURZEL SCHIEBEN ???
 
                 // neue Series mit Name und Daten erzeugen und hinzufügen
                 XYChart.Series<String, Number> series = new Series<>(typ + ", " + held, datenListe);
@@ -171,8 +170,41 @@ public class Presenter {
      * __________________________________________________________________
      */
 
-    public void DifferenzAnsichtNeu(TabDifferenz source) {
+    public void DifferenzAnsichtNeu(TabDiff source) {
 
+        ObservableList<XYChart.Series<String, Number>> seriesListe = FXCollections.observableArrayList();
+
+        Double max = 0.0;
+        Double min = 0.0;
+
+        for (int h = 0; h < wurzel.getPrj().HELDEN().length; h++) {
+            String held = wurzel.getPrj().HELDEN()[h];
+
+            ObservableList<XYChart.Data<String, Number>> datenListe = FXCollections.observableArrayList();
+
+            ObservableMap<LocalDateTime, NumberBinding> kumulDifMap = wurzel.getKumulDifMap(held);
+            for (LocalDateTime date : kumulDifMap.keySet()) {
+
+                // Werte sammeln
+                String m = datumFormat(date.getYear(), date.getMonthValue());
+                double d = kumulDifMap.get(date).doubleValue();
+                XYChart.Data<String, Number> datenPunkt = new XYChart.Data<>(m, d);
+                datenListe.add(datenPunkt);
+
+                // parallel Max/ Min
+                if (d > 0 && d > max) { max = d; }
+                if (d < 0 && d < min) { min = d; }
+
+            }
+
+            // neue Series mit Name und Daten erzeugen und hinzufügen
+            XYChart.Series<String, Number> series = new Series<>(held + ", " + held, datenListe);
+            seriesListe.add(series);
+        }
+
+        // Werte an das Tab zurück geben
+        source.aktChartDaten(seriesListe);
+        source.aktBetragAchse(max, min);
     }
 
     /*
@@ -183,7 +215,7 @@ public class Presenter {
     public boolean addBuchung(TabTyp aktTab, String betragString, String hinweis, LocalDate datum) {
         String aktTyp = aktTab.getText();
         try {
-            wurzel.add(new Buchung(wurzel.getPrj().aktHeld(), aktTyp, LocalDateTime.of(datum, LocalTime.now()), parseDoubleBetrag(betragString), hinweis));
+            wurzel.add(new Buchung(wurzel.getPrj().aktHeld(), aktTyp, LocalDateTime.of(datum, LocalTime.now()), BetragStringConverter.parseDoubleBetrag(betragString), hinweis));
 
         } catch (Exception e) {
             System.out.println(e);
@@ -191,40 +223,6 @@ public class Presenter {
         }
         tabellenAnsichtNeu(aktTab);
         return true;
-    }
-
-    // Eingabeprüfung für Betrag
-    private static Double parseDoubleBetrag(String betragString) {
-        // Leerzeichen entfernen
-        betragString.trim();
-        // wenn leer, dann 0
-        if (betragString.equals("")) { return Double.valueOf(0.0); }
-        // VORZEICHEN: AUsgaben immer neg. (-)
-        char[] betragChrAy = betragString.toCharArray();
-        // wenn (-) char=45
-        if (betragChrAy[0] == 45) { return -1 * myParser(betragChrAy); }
-        // wenn (+) char=43
-        if (betragChrAy[0] == 43) { return myParser(betragChrAy); }
-        // sonnst immer von neg. Ausgabe ausgehen
-        return -1 * myParser(betragChrAy);
-    }
-
-    private static Double myParser(char[] betragChrAy) {
-        String betragString = "";
-        boolean decimal = false;
-        // nur Zahlen und das erste Komma/ Punkt werden genommen
-        // Rest wird ignoriert
-        for (int i = 0; i < betragChrAy.length; i++) {
-            if (47 < betragChrAy[i] && betragChrAy[i] < 58) {
-                betragString += betragChrAy[i];
-            } else {
-                if ((betragChrAy[i] == 44 || betragChrAy[i] == 46) & !decimal) {
-                    betragString += ".";
-                    decimal = true;
-                }
-            }
-        }
-        return Double.parseDouble(betragString);
     }
 
     public boolean removeBuchung(TabTyp aktTab, Buchung buchung) {
@@ -323,6 +321,7 @@ public class Presenter {
     public void buchungenSpeichern() {
         // Buchungen speichern, ohne increment
         Datei.buchExport(wurzel);
+        setTitle();
     }
 
     // ExportButton / "Speichern unter"
@@ -336,6 +335,40 @@ public class Presenter {
             System.out.println("Ausgewähltes Verzeichniss: " + dirPath);
             // Buchungen und Projekt speichern (dabei ohne increment)
             Datei.buchExport(wurzel, dirPath);
+        }
+    }
+
+    // ExportButton / "Speichern unter"
+    public void prjExpChoseName() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Speichern unter");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Charly-Projekt", "*" + Datei.prjSuffix), new FileChooser.ExtensionFilter("Charly-Buchung", "*" + Datei.bchSuffix), new FileChooser.ExtensionFilter("Charly-Icon", "*.icon.bmp"), new FileChooser.ExtensionFilter("alle Dateien", "*.*"));
+        Stage choose = new Stage();
+        File dirFile = fileChooser.showSaveDialog(choose);
+
+        if (dirFile != null) {
+            Path choosePath = dirFile.toPath();
+
+            // WunschNamen & Pfad extrahieren
+            int i = choosePath.getNameCount();
+            Path dirPath = choosePath.subpath(0, i - 1);
+            System.out.println("dirPath: " + dirPath);
+
+            Path namePath = choosePath.subpath(i - 1, i);
+            String dateiname = namePath.toString();
+            System.out.println("Dateiname: " + dateiname);
+            String[] namenSplitter = dateiname.split(Pattern.quote(Datei.prjSuffix));
+            String name = PrjStringConverter.checkedPrjName(namenSplitter[0]);
+            System.out.println("Projektname: " + name);
+            // Projekt umbenennen
+            Datei.changePrjName(wurzel, name);
+
+            // Buchungen und Projekt speichern (dabei ohne increment)
+            System.out.println("Ausgewähltes Verzeichniss: " + dirPath);
+            Datei.buchExport(wurzel, dirPath);
+
+            // Ansicht erneuern mit neuem Namen
+            setTitle();
         }
     }
 
@@ -358,11 +391,11 @@ public class Presenter {
         String url = "/gui/" + held + ".bmp";
         // Nur wenn im Projektordener wirklich was drinn ist, wird der Standartverweis überschrieben
         Path prjFolderPath = wurzel.getPrj().getPrjFolderPath();
-        Path imgPath = Paths.get(prjFolderPath.toString() + "\\" + held + ".bmp");
+        Path imgPath = Paths.get(prjFolderPath.toString() + "\\" + held + ".icon.bmp");
         try {
             url = imgPath.toUri().toURL().toString();
         } catch (MalformedURLException e) {
-            System.out.println("im Projektordner sind keine Icon vorhanden: 'heldName.bmp'");
+            System.out.println("im Projektordner sind keine Icon vorhanden: 'heldName.icon.bmp'");
         }
         System.out.println("HeldIcon gefunden" + url);
         Image image = new Image(url, true);

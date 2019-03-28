@@ -8,7 +8,7 @@ import javafx.util.*;
 
 import model.*;
 
-public class BtnCellFactory implements Callback<TableColumn<Buchung, Button>, TableCell<Buchung, Button>> {
+class BtnCellFactory implements Callback<TableColumn<Buchung, Button>, TableCell<Buchung, Button>> {
     private Image imgBtn;
     private TabTyp tabTyp;
     private Double BREITE;

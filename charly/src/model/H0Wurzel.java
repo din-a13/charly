@@ -130,7 +130,7 @@ public class H0Wurzel {
                         } else {
                             wurzelKumulSumMap.put(date, wurzelKumulSumMap.get(date).add(heldKumulSumMap.get(date)));
                         }
-                        // TODO HIER MUSS IRGENDWIE EIN DURCHSCHNITT ERRECHNET WERDEN
+                        // HIER MUSS IRGENDWIE EIN DURCHSCHNITT ERRECHNET WERDEN
                         // Monatssummen Differenzsumme immer wieder überschreiben aufbauen
                         heldKumulDifMap.put(date, wurzelKumulSumMap.get(date).divide(prj.HELDEN().length).subtract(heldKumulSumMap.get(date)));
                     }
@@ -300,8 +300,8 @@ public class H0Wurzel {
     }
 
     // Presenter für Differenzansicht
-    public ObservableList<NumberBinding> getKumulDifListe(String held) {
-        return FXCollections.observableArrayList(wurzelHeldenMap.get(held).getHeldKumulDifMap().values());
+    public ObservableMap<LocalDateTime, NumberBinding> getKumulDifMap(String held) {
+        return FXCollections.observableMap(wurzelHeldenMap.get(held).getHeldKumulDifMap());
     }
 
     public String[] getHeldenXx() {

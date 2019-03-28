@@ -12,7 +12,6 @@ import javafx.scene.image.*;
 import javafx.scene.layout.*;
 import javafx.util.converter.*;
 
-import gui.impDlg.*;
 import model.*;
 
 public class TabTyp extends Tab {
@@ -93,8 +92,9 @@ public class TabTyp extends Tab {
         hinweisCol.setMaxWidth(Double.MAX_VALUE); // Diese Spalte Soll mitwachsen
         datumCol.setCellValueFactory(new DateCellValueFactory());
         // Format Betrag
+        // TODO ich muss einen eigenen betrag Converter für die String->Double conversion haben!
         NumberFormat betragFormat = NumberFormat.getCurrencyInstance(Locale.GERMANY);
-        NumberStringConverter betragConverter = new NumberStringConverter(betragFormat);
+        NumberStringConverter betragConverter = new BetragStringConverter(betragFormat);
         betragCol.setCellValueFactory(item -> item.getValue().getBetrag());
         betragCol.setCellFactory(EditTextFieldTableCell.<Buchung, Number> forTableColumn(this, betragConverter));
         hinweisCol.setCellValueFactory(item -> item.getValue().getHinweis());

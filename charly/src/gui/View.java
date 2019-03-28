@@ -87,7 +87,7 @@ public class View extends HBox {
         MenuItem buchSpeich = new MenuItem("Projekt speichern");
         buchSpeich.setOnAction((e) -> presenter.buchungenSpeichern());
         MenuItem exp = new MenuItem("Projekt exportieren");
-        exp.setOnAction((e) -> presenter.prjExp());
+        exp.setOnAction((e) -> presenter.prjExpChoseName());
         dateiMenu.setPopupSide(Side.RIGHT);
         dateiMenu.getItems().addAll(imp, new SeparatorMenuItem(), buchSpeich, exp);
 
@@ -149,7 +149,12 @@ public class View extends HBox {
         TabWertung tabA = new TabWertung(presenter, "Auswertung");
         tabFeld.getTabs().add(tabA);
 
-        // Typenbearbeitungs aktualisieren
+        // Tab für Differenzansicht einfügen
+        // wird nicht in die tabListe eingefügt, die ist nur für die Typen da
+        TabDiff tabD = new TabDiff(presenter, "Differenz");
+        tabFeld.getTabs().add(tabD);
+
+        // Typenbearbeitungsmöglichkeit (Menü) aktualisieren
         typXxMenue.getItems().clear();
         for (int i = 0; i < typenXX.length; i++) {
             MenuItem neuXx = new MenuItem("Xx " + typenXX[i]);

@@ -10,7 +10,7 @@ import javafx.util.*;
 
 import model.*;
 
-public class DateCellValueFactory implements Callback<CellDataFeatures<Buchung, String>, ObservableValue<String>> {
+class DateCellValueFactory implements Callback<CellDataFeatures<Buchung, String>, ObservableValue<String>> {
 
     @Override
     public ObservableValue<String> call(CellDataFeatures<Buchung, String> buchungZeile) {

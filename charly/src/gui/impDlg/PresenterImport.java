@@ -89,7 +89,7 @@ public class PresenterImport {
     void fileChooser() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Projekt suchen");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Charly-Projekte", "*.prj.txt"), new FileChooser.ExtensionFilter("Charly-Buchungen", "*.bch.txt"));
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Charly-Projekt", "*" + Datei.prjSuffix), new FileChooser.ExtensionFilter("Charly-Buchung", "*" + Datei.bchSuffix), new FileChooser.ExtensionFilter("Charly-Icon", "*.icon.bmp"), new FileChooser.ExtensionFilter("alle Dateien", "*.*"));
         Stage choose = new Stage();
         File file = fileChooser.showOpenDialog(choose);
         if (file != null) {

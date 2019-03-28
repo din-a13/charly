@@ -18,11 +18,9 @@ public class PrjStringConverter extends StringConverter<Projekt> {
 
     @Override
     public Projekt fromString(String eingabe) {
-        // Der Nutzer erwartet, wenn keine Eingabe erfolgte, wird abgebrochen
-        if (eingabe == null || eingabe.trim().equals("")) { return null; }
 
-        // Entferne Sonderzeichen außer +-_() und |
-        String eingabeFlt = eingabe.replaceAll("[^\\wäüöÄÜÖ\\+\\-_\\(\\)\\|]", "");
+        String eingabeFlt = checkedPrjName(eingabe);
+        if (eingabeFlt == null) { return null; } // abrechen, wenn keine Eingabe erfolgte
 
         // Auswahl des richtigen Projektes aus der Liste
         // Wenn nicht enthalten, dann erzeuge ein neues leeres Projekt mit dem Eingabenamen
@@ -50,5 +48,15 @@ public class PrjStringConverter extends StringConverter<Projekt> {
         } else {
             return "";
         }
+    }
+
+    public static String checkedPrjName(String eingabe) {
+        // Der Nutzer erwartet, wenn keine Eingabe erfolgte, wird abgebrochen
+        if (eingabe == null || eingabe.trim().equals("")) { return null; }
+
+        // Entferne Sonderzeichen außer +-_() und |
+        String eingabeFlt = eingabe.replaceAll("[^\\wäüöÄÜÖ\\+\\-_\\(\\)\\|]", "");
+
+        return eingabeFlt;
     }
 }

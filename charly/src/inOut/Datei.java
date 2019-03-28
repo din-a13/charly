@@ -19,8 +19,8 @@ public class Datei {
      */
     private static Charset charset = Charset.forName("UTF-8");
     private static final String dir = "io/"; // Mutterverzeichniss ist der Projektordner im Workspace
-    private static final String prjSuffix = ".prj.txt";
-    private static final String bchSuffix = ".bch.txt";
+    public static final String prjSuffix = ".prj.txt";
+    public static final String bchSuffix = ".bch.txt";
 
     /*
      * Dateipfade

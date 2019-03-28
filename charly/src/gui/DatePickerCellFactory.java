@@ -5,7 +5,7 @@ import java.time.*;
 import javafx.scene.control.*;
 import javafx.util.*;
 
-public class DatePickerCellFactory implements Callback<DatePicker, DateCell> {
+class DatePickerCellFactory implements Callback<DatePicker, DateCell> {
 
     // Alle Zellen außerhalb des Projektzeitraums werden ausgegraut
     int min;
