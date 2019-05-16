@@ -14,7 +14,7 @@ public class SummenBuchung extends Buchung {
      * ...|.........................|...
      * bindVorgKumSum1<----------bindVorgKumSum2
      *
-     * kumSum ist Statisch - kein Binding!
+     * kumSum ist Wert - kein Binding!
      * wird mit buchungSumme immer aktualisert
      * sonnst funktioniert Binding mit Helden / Wurzel nicht
      * (die brauchen einen Property - als Variable)

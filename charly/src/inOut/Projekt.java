@@ -80,7 +80,7 @@ public class Projekt implements Serializable {
         // DemoArrays
         String[] h = { "Eva", "Daniel" };
         String[] t = { "Lebensmittel", "Kinder", "Wohnung", "Auto", "UrlaubUndSo" };
-        int[] j = { 2019, 2020 };
+        int[] j = { 2018, 2030 };
         return new Projekt(projektName, h, t, j);
     }
 

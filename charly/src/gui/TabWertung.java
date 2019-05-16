@@ -11,8 +11,6 @@ import javafx.scene.chart.XYChart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import gui.impDlg.*;
-
 public class TabWertung extends Tab {
 
     /*
@@ -75,6 +73,8 @@ public class TabWertung extends Tab {
         scrollPane.setContent(stackedChart);
         initChartWidth();
         jumpToDate(LocalDateTime.now()); // ScrollPane auf dieses Jahr stellen
+        presenter.AuswertungAnsichtNeu(this); // zum erstmaligen Init der Achsen - Layout wird nur neu gemacht, wenn
+                                              // Daten eingefügt werden
 
         // TEILUNG hor 2 - ZUSAMMENSETZEN
         tabInhVbox.getChildren().addAll(platzhalter, scrollPane);

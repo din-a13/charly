@@ -53,7 +53,7 @@ public class H0Wurzel {
      * SUMMEN - Lösung mit SimpleDoubleProperty
      * an diese werden die DoubleProperties der Buchungen gebunden
      *
-     * TODO Die ersten 3 Gesamtsummen werden NUR ZUR KONTROLLE DES MODELL
+     * TODO Die ersten 3 Gesamtsummen werden NUR ZUR KONTROLLE DES MODELL genutzt
      *
      * // wurzelSumme 1 ____________________________________________ Binding
      * // // heldSumme 1...n Wurzel ________________________________ Binding
@@ -68,9 +68,10 @@ public class H0Wurzel {
      * // Monatsbuchung __yyyy_mm_01_0__0__2
      *
      * // Map<String,Held> ____________________wurzelHeldenMap______Object Attribut
-     * // Map<LocalDateTime,NumberBinding> ____wurzelKumulDifMap____Object Attribut
+     * // Map<LocalDateTime,NumberBinding> ____wurzelKumulSumMap____Object Attribut
      * // // Map<String,Typ> __________________heldTypenMap_________Object Attribut
      * // // Map<LocalDateTime,NumberBinding> _heldKumulSumMap______Object Attribut
+     * // // Map<LocalDateTime,NumberBinding> _heldKumulDifMap______Object Attribut
      * // // // Map<LocalDateTime,Buchung> ____typBuchungsMap_______Object Attribut
      *
      * Klassenbeziehung - an Properties kann leider kein USERDATA gebunden werden
@@ -81,7 +82,7 @@ public class H0Wurzel {
      * // // // // Buchung
      */
 
-    private NumberBinding wurzelSumBind;
+    private NumberBinding wurzelSumBind; // TODO nicht benötigt
     private ObservableMap<LocalDateTime, NumberBinding> wurzelKumulSumMap;
     private ObservableMap<String, H1Held> wurzelHeldenMap;
 
@@ -119,18 +120,20 @@ public class H0Wurzel {
                             NumberBinding monBindVorgKumSumNEU = monatBuchung.getBindVorgKumSum().add(vorMonBindVorgKumSum);
                             monatBuchung.setBindVorgKumSum(monBindVorgKumSumNEU);
                         }
-                        // beim ersten mal erst ein neues Binding erzeugen (Null)
+                        // Held: beim ersten mal erst ein neues Binding erzeugen (Null)
+                        // kumulSumMap nur als Zwischenspeicher benötigt
                         if (heldKumulSumMap.get(date) == null) {
                             heldKumulSumMap.put(date, monatBuchung.getBindVorgKumSum());
                         } else {
                             heldKumulSumMap.put(date, heldKumulSumMap.get(date).add(monatBuchung.getBindVorgKumSum()));
                         }
+                        // Wurzel: beim ersten mal erst ein neues Binding erzeugen (Null)
                         if (wurzelKumulSumMap.get(date) == null) {
                             wurzelKumulSumMap.put(date, monatBuchung.getBindVorgKumSum());
                         } else {
                             wurzelKumulSumMap.put(date, wurzelKumulSumMap.get(date).add(heldKumulSumMap.get(date)));
                         }
-                        // HIER MUSS IRGENDWIE EIN DURCHSCHNITT ERRECHNET WERDEN
+                        // TODO HIER MUSS IRGENDWIE EIN DURCHSCHNITT ERRECHNET WERDEN
                         // Monatssummen Differenzsumme immer wieder überschreiben aufbauen
                         heldKumulDifMap.put(date, wurzelKumulSumMap.get(date).divide(prj.HELDEN().length).subtract(heldKumulSumMap.get(date)));
                     }

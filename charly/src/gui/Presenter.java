@@ -166,7 +166,7 @@ public class Presenter {
     }
 
     /*
-     * Aktualisieren -- Ansprache durch TabAusgleich
+     * Aktualisieren -- Ansprache durch TabDiff
      * __________________________________________________________________
      */
 

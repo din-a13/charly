@@ -73,6 +73,7 @@ public class TabDiff extends Tab {
         scrollPane.setContent(stackedChart);
         initChartWidth();
         jumpToDate(LocalDateTime.now()); // ScrollPane auf dieses Jahr stellen
+        presenter.DifferenzAnsichtNeu(this); // zur erstmaligen initialisierung der Achsen nötig
 
         // TEILUNG hor 2 - ZUSAMMENSETZEN
         tabInhVbox.getChildren().addAll(platzhalter, scrollPane);
@@ -107,13 +108,14 @@ public class TabDiff extends Tab {
 
     // Betrag Achse anpassen
     public void aktBetragAchse(double max, double min) {
-        betragAxis.setUpperBound(max * 1.5);
+        betragAxis.setUpperBound(max * 2.5);
         if (max > 1000) {
             betragAxis.setTickUnit(50);
         } else {
             if (max > 500) { betragAxis.setTickUnit(20); }
         }
         if (min != 0) { betragAxis.setLowerBound(min * 1.1); }
+
     }
 
     // Aktualisierung der Daten
